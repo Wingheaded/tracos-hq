@@ -16,10 +16,16 @@ export type Message = {
 export type SpecialistStreamEvent =
   | { type: "delta"; text: string }
   | { type: "status"; text: string }
+  | { type: "consulted"; names: string[] }
   | { type: "message"; message: Message }
   | { type: "error"; error: string };
 
+const ORCHESTRATOR_MENTION = /(?:^|[^\p{L}\p{N}_])@Orchestrator(?![\p{L}\p{N}_])/iu;
 const LEADS_MENTION = /(?:^|[^\p{L}\p{N}_])@Leads(?![\p{L}\p{N}_])/iu;
+
+export function mentionsOrchestrator(content: string): boolean {
+  return ORCHESTRATOR_MENTION.test(content);
+}
 
 export function mentionsLeads(content: string): boolean {
   return LEADS_MENTION.test(content);

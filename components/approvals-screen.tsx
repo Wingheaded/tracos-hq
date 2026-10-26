@@ -4,6 +4,7 @@ import { LeadsAdmin } from "@/components/leads-admin";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import type { ApprovalRecord } from "@/lib/approval";
+import { formatApprovalDate } from "@/lib/dates";
 import { USERS, type UserName } from "@/lib/constants";
 import type { NoteOffer } from "@/lib/message";
 
@@ -46,7 +47,7 @@ function headline(approval: ApprovalRecord) {
 function detail(approval: ApprovalRecord) {
   const parts: string[] = [];
   const due = textValue(approval.payload, "due_date");
-  if (due) parts.push(due);
+  if (due) parts.push(formatApprovalDate(due));
   const city = textValue(approval.payload, "city");
   if (city) parts.push(city);
   const contact = textValue(approval.payload, "contact");

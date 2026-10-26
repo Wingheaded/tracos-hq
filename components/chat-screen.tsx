@@ -1,5 +1,6 @@
 "use client";
 
+import { AgentMarkdown } from "@/components/agent-markdown";
 import { LeadTable } from "@/components/lead-table";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -9,6 +10,7 @@ import {
   leadTable,
   mentionedSpecialists,
   mentionsLeads,
+  mentionsOrchestrator,
   noteOffer,
   type Message,
   type NoteOffer,
@@ -252,7 +254,13 @@ export function ChatScreen() {
       setLoaded({ channel: target, messages: payload.messages ?? [], error: null });
       setDraft("");
 
-      for (const agent of mentionedSpecialists(content)) {
+      const streamReply = async (
+        authorName: string,
+        url: string,
+        body: Record<string, unknown>,
+        failure: string,
+        initialStatus: string | null,
+      ) => {
         if (channelRef.current !== target || generation.current !== generationAtStart) return;
         const tempId = --pendingId.current;
         setLoaded((current) => {
@@ -264,27 +272,27 @@ export function ChatScreen() {
               {
                 id: tempId,
                 channel: target,
-                author: agent,
+                author: authorName,
                 author_type: "agent",
                 content: "",
                 meta_json: null,
                 created_at: new Date().toISOString(),
                 pending: true,
-                status: `${agent} está a escrever…`,
+                status: initialStatus ?? undefined,
               },
             ],
           };
         });
 
-        const streamed = await fetch("/api/specialists", {
+        const streamed = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ channel: target, agent, content }),
+          body: JSON.stringify(body),
           signal: abort.signal,
         });
         if (!streamed.ok) {
-          const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
-          throw new Error(failure.error ?? "O especialista não conseguiu responder.");
+          const problem = (await streamed.json().catch(() => ({}))) as { error?: string };
+          throw new Error(problem.error ?? failure);
         }
 
         await readSpecialistStream(streamed, (event) => {
@@ -296,6 +304,9 @@ export function ChatScreen() {
               ...current,
               messages: current.messages.map((message) => {
                 if (message.id !== tempId) return message;
+                if (event.type === "consulted") {
+                  return { ...message, meta_json: JSON.stringify({ consulted: event.names }) };
+                }
                 if (event.type === "status") return { ...message, status: event.text };
                 if (event.type === "delta") return { ...message, status: undefined, content: message.content + event.text };
                 if (event.type === "message") return event.message;
@@ -304,63 +315,42 @@ export function ChatScreen() {
             };
           });
         });
+      };
+
+      for (const agent of mentionedSpecialists(content)) {
+        await streamReply(
+          agent,
+          "/api/specialists",
+          { channel: target, agent, content },
+          "O especialista não conseguiu responder.",
+          `${agent} está a escrever…`,
+        );
+      }
+      if (mentionsOrchestrator(content)) {
+        await streamReply(
+          "Orchestrator",
+          "/api/orchestrator",
+          { channel: target, author, content },
+          "O Orchestrator não conseguiu responder.",
+          null,
+        );
       }
       if (target === "leads" && mentionsLeads(content)) {
-        if (channelRef.current !== target || generation.current !== generationAtStart) return;
-        const tempId = --pendingId.current;
-        setLoaded((current) => {
-          if (!current || current.channel !== target) return current;
-          return {
-            ...current,
-            messages: [
-              ...current.messages,
-              {
-                id: tempId,
-                channel: target,
-                author: "Leads",
-                author_type: "agent",
-                content: "",
-                meta_json: null,
-                created_at: new Date().toISOString(),
-                pending: true,
-                status: "A pesquisar na internet…",
-              },
-            ],
-          };
-        });
-
-        const streamed = await fetch("/api/leads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ channel: target, author, content }),
-          signal: abort.signal,
-        });
-        if (!streamed.ok) {
-          const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
-          throw new Error(failure.error ?? "O Leads não conseguiu pesquisar.");
-        }
-
-        await readSpecialistStream(streamed, (event) => {
-          if (channelRef.current !== target || generation.current !== generationAtStart) return;
-          if (event.type === "error") throw new Error(event.error);
-          setLoaded((current) => {
-            if (!current || current.channel !== target) return current;
-            return {
-              ...current,
-              messages: current.messages.map((message) => {
-                if (message.id !== tempId) return message;
-                if (event.type === "status") return { ...message, status: event.text };
-                if (event.type === "delta") return { ...message, status: undefined, content: message.content + event.text };
-                if (event.type === "message") return event.message;
-                return message;
-              }),
-            };
-          });
-        });
+        await streamReply(
+          "Leads",
+          "/api/leads",
+          { channel: target, author, content },
+          "O Leads não conseguiu pesquisar.",
+          "A pesquisar na internet…",
+        );
       }
     } catch (cause: unknown) {
       if (cause instanceof DOMException && cause.name === "AbortError") return;
       if (channelRef.current === target) {
+        setLoaded((current) => {
+          if (!current || current.channel !== target) return current;
+          return { ...current, messages: current.messages.filter((item) => item.id > 0) };
+        });
         setSendError(cause instanceof Error ? cause.message : "Não foi possível enviar a mensagem.");
       }
     } finally {
@@ -433,7 +423,7 @@ export function ChatScreen() {
             <p className="max-w-md py-8 text-sm leading-6 text-muted">
               {active.id === "leads"
                 ? "Ainda não há mensagens em #leads. Menciona @Leads, por exemplo: encontra hotéis no Algarve que renovaram recentemente."
-                : `Ainda não há mensagens em ${active.label}. Menciona @Echo ou um especialista: @Daniel, @Tomás, @Maya, @André, @Inês.`}
+                : `Ainda não há mensagens em ${active.label}. Menciona @Orchestrator, @Echo ou um especialista: @Daniel, @Tomás, @Maya, @André, @Inês.`}
             </p>
           ) : (
             <ol>
@@ -450,14 +440,21 @@ export function ChatScreen() {
                       </time>
                     </div>
                     <div className={message.author_type === "agent" ? "border-l-2 border-olive pl-3" : undefined}>
-                      {message.author_type === "agent" && message.pending && message.status && !message.content ? (
-                        <p className="flex items-center gap-2 text-xs text-muted">
-                          <span
-                            className="size-1.5 shrink-0 rounded-full bg-current motion-safe:animate-pulse"
-                            aria-hidden="true"
-                          />
-                          {message.status}
-                        </p>
+                      {consulted.length > 0 ? (
+                        <p className="mb-1 text-xs text-muted">Consultados: {consulted.join(", ")}</p>
+                      ) : null}
+                      {message.author_type === "agent" ? (
+                        message.content ? (
+                          <AgentMarkdown text={message.content} />
+                        ) : message.pending && message.status ? (
+                          <p className="flex items-center gap-2 text-xs text-muted">
+                            <span
+                              className="size-1.5 shrink-0 rounded-full bg-current motion-safe:animate-pulse"
+                              aria-hidden="true"
+                            />
+                            {message.status}
+                          </p>
+                        ) : null
                       ) : (
                         <p className="whitespace-pre-wrap text-[15px] leading-6">{message.content}</p>
                       )}
@@ -467,9 +464,6 @@ export function ChatScreen() {
                           busy={leadBusy === message.id}
                           onPropose={(ids) => void proposeLeads(message.id, ids)}
                         />
-                      ) : null}
-                      {consulted.length > 0 ? (
-                        <p className="mt-1 text-xs text-muted">Consultados: {consulted.join(", ")}</p>
                       ) : null}
                       {offer?.proposed ? (
                         <p className="mt-2 text-sm text-muted">Nota proposta. Está à espera nas Aprovações.</p>

@@ -7,6 +7,9 @@ import { prefersEnglish, REPLY_LANGUAGE_RULE } from "@/lib/locale";
 import { insertAgentMessage } from "@/lib/messages";
 import type { Message } from "@/lib/message";
 
+export const PRICE_PRESENTATION_RULE = `Prices:
+indicative_price_range is the brand's indicative range. Present it as "gama indicativa da marca", never as the price of a specific product or collection. Only price_samples are product prices. If a product has no price_sample, do not attach the brand range to it.`;
+
 const DUMMY_KEYS = new Set([
   "changeme",
   "change-me",
@@ -45,6 +48,21 @@ export function placeholderReply(brand: string, content = "") {
   return `Resposta de recurso. A primeira marca do meu catálogo é "${brand}".`;
 }
 
+function catalogForPrompt(catalogJson: string) {
+  try {
+    const parsed = JSON.parse(catalogJson) as { brands?: Record<string, unknown>[] };
+    if (!Array.isArray(parsed.brands)) return catalogJson;
+    for (const brand of parsed.brands) {
+      if (!brand || typeof brand !== "object" || !("indicative_price_range" in brand)) continue;
+      brand.gama_indicativa_da_marca = brand.indicative_price_range;
+      delete brand.indicative_price_range;
+    }
+    return JSON.stringify(parsed, null, 2);
+  } catch {
+    return catalogJson;
+  }
+}
+
 function systemPrompt(specialist: Specialist, catalogJson: string) {
   const templatePath = path.join(process.cwd(), "kit", "prompts", "specialist.md");
   const template = fs.readFileSync(templatePath, "utf8");
@@ -56,8 +74,8 @@ function systemPrompt(specialist: Specialist, catalogJson: string) {
     .replaceAll("{{name}}", specialist.name)
     .replaceAll("{{segment}}", specialist.segment)
     .replaceAll("{{human_owner}}", specialist.humanOwner)
-    .replaceAll("{{catalog_json}}", catalogJson.trim());
-  return `${body}\n\n${REPLY_LANGUAGE_RULE}`;
+    .replaceAll("{{catalog_json}}", catalogForPrompt(catalogJson.trim()));
+  return `${body}\n\n${PRICE_PRESENTATION_RULE}\n\n${REPLY_LANGUAGE_RULE}`;
 }
 
 function keyIsUsable(key: string | undefined): key is string {
@@ -85,13 +103,13 @@ async function emitText(text: string, onDelta: (text: string) => void) {
   }
 }
 
-export async function answerSpecialist(input: {
-  channel: Channel;
+export async function consultSpecialist(input: {
   agent: SpecialistName;
   content: string;
-  onDelta: (text: string) => void;
-}): Promise<Message> {
+  onDelta?: (text: string) => void;
+}): Promise<string> {
   const specialist = specialistByName(input.agent);
+  const onDelta = input.onDelta ?? (() => {});
   const catalog = readCatalog(specialist);
   const fallback = placeholderReply(firstBrand(catalog), input.content);
   const apiKey = process.env.XAI_API_KEY;
@@ -100,7 +118,7 @@ export async function answerSpecialist(input: {
   let answer = "";
   if (!keyIsUsable(apiKey) || !model) {
     answer = fallback;
-    await emitText(answer, input.onDelta);
+    await emitText(answer, onDelta);
   } else {
     try {
       const client = new OpenAI({ apiKey: apiKey.trim(), baseURL: "https://api.x.ai/v1" });
@@ -116,22 +134,36 @@ export async function answerSpecialist(input: {
         const text = chunk.choices[0]?.delta?.content ?? "";
         if (!text) continue;
         answer += text;
-        input.onDelta(text);
+        onDelta(text);
       }
       if (!answer.trim()) {
         answer = fallback;
-        await emitText(answer, input.onDelta);
+        await emitText(answer, onDelta);
       }
     } catch (error) {
       if (answer.length > 0 || !isInvalidKeyError(error)) throw error;
       answer = fallback;
-      await emitText(answer, input.onDelta);
+      await emitText(answer, onDelta);
     }
   }
 
+  return answer.trim();
+}
+
+export async function answerSpecialist(input: {
+  channel: Channel;
+  agent: SpecialistName;
+  content: string;
+  onDelta: (text: string) => void;
+}): Promise<Message> {
+  const content = await consultSpecialist({
+    agent: input.agent,
+    content: input.content,
+    onDelta: input.onDelta,
+  });
   return insertAgentMessage({
     channel: input.channel,
-    author: specialist.name,
-    content: answer.trim(),
+    author: input.agent,
+    content,
   });
 }

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { duplicateMessage, isApprovalType, type ApprovalRecord, type ApprovalType, type CrmMatch } from "@/lib/approval";
+import { settleActivityDueDate } from "@/lib/dates";
 import type { Channel } from "@/lib/constants";
 import { getDb } from "@/lib/db";
 import type { NoteOffer } from "@/lib/message";
@@ -54,6 +55,12 @@ function collectEmails(...values: unknown[]): string[] {
   return [...new Set(found)];
 }
 
+function storedDueDate(value: unknown) {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const settled = settleActivityDueDate({ due_date: value }, "");
+  return typeof settled.due_date === "string" ? settled.due_date : undefined;
+}
+
 function optionalLeadId(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
@@ -80,7 +87,7 @@ function normalizePayload(type: ApprovalType, payload: unknown): Record<string, 
     return {
       subject: requiredText(record.subject, "subject"),
       type: typeof record.type === "string" && record.type.trim() ? record.type.trim() : "meeting",
-      due_date: typeof record.due_date === "string" ? record.due_date : undefined,
+      due_date: storedDueDate(record.due_date),
       org_id: positiveId(record.org_id, "organization"),
       deal_id: positiveId(record.deal_id, "deal"),
       person_id: positiveId(record.person_id, "person"),

@@ -1,4 +1,5 @@
 import { SPECIALISTS, type Channel, type SpecialistName } from "@/lib/constants";
+import { limitLeadSegments } from "@/lib/lead-parse";
 
 export type AuthorType = "human" | "agent";
 
@@ -17,6 +18,12 @@ export type SpecialistStreamEvent =
   | { type: "status"; text: string }
   | { type: "message"; message: Message }
   | { type: "error"; error: string };
+
+const LEADS_MENTION = /(?:^|[^\p{L}\p{N}_])@Leads(?![\p{L}\p{N}_])/iu;
+
+export function mentionsLeads(content: string): boolean {
+  return LEADS_MENTION.test(content);
+}
 
 export function mentionedSpecialists(content: string): SpecialistName[] {
   const hits: { index: number; name: SpecialistName }[] = [];
@@ -63,6 +70,94 @@ export function noteOffer(metaJson: string | null): NoteOffer | null {
       lead_id: leadId,
       proposed: offer.proposed === true,
     };
+  } catch {
+    return null;
+  }
+}
+
+export type LeadRowStatus = "new" | "approved" | "sent" | "duplicate";
+
+export const LEAD_STATUS_LABEL: Record<LeadRowStatus, string> = {
+  new: "Nova",
+  approved: "Em aprovação",
+  sent: "Enviada para o CRM",
+  duplicate: "Já no Pipedrive",
+};
+
+export const LEAD_SEGMENT_LABEL: Record<string, string> = {
+  lighting: "Iluminação",
+  acoustics: "Acústica",
+  outdoor: "Exterior",
+  workplace: "Escritórios",
+  biophilia: "Biofilia",
+};
+
+export type LeadTableRow = {
+  id: number;
+  company: string;
+  city: string;
+  whyItFits: string;
+  segments: string[];
+  sourceUrl: string;
+  status: LeadRowStatus;
+};
+
+export type LeadTable = {
+  searchId: number;
+  fallback: boolean;
+  rows: LeadTableRow[];
+};
+
+export type LeadBoardLead = LeadTableRow & {
+  sector: string;
+  website: string;
+  generalContact: string;
+};
+
+export type LeadBoardSearch = {
+  id: number;
+  query: string;
+  createdBy: string | null;
+  createdAt: string;
+  fallback: boolean;
+  leads: LeadBoardLead[];
+};
+
+function leadStatus(value: unknown): LeadRowStatus {
+  if (value === "approved" || value === "sent" || value === "duplicate") return value;
+  return "new";
+}
+
+export function leadTable(metaJson: string | null): LeadTable | null {
+  if (!metaJson) return null;
+  try {
+    const meta = JSON.parse(metaJson) as { leadsTable?: unknown };
+    if (!meta.leadsTable || typeof meta.leadsTable !== "object" || Array.isArray(meta.leadsTable)) return null;
+    const table = meta.leadsTable as Record<string, unknown>;
+    const searchId = positive(table.searchId);
+    if (!searchId || !Array.isArray(table.rows)) return null;
+    const rows: LeadTableRow[] = [];
+    for (const item of table.rows) {
+      if (!item || typeof item !== "object" || Array.isArray(item)) continue;
+      const row = item as Record<string, unknown>;
+      const id = positive(row.id);
+      const company = typeof row.company === "string" ? row.company.trim() : "";
+      const sourceUrl = typeof row.sourceUrl === "string" ? row.sourceUrl.trim() : "";
+      if (!id || !company || !sourceUrl) continue;
+      rows.push({
+        id,
+        company,
+        city: typeof row.city === "string" ? row.city.trim() : "",
+        whyItFits: typeof row.whyItFits === "string" ? row.whyItFits.trim() : "",
+        segments: limitLeadSegments(
+          typeof row.whyItFits === "string" ? row.whyItFits : "",
+          Array.isArray(row.segments) ? row.segments.filter((segment): segment is string => typeof segment === "string") : [],
+        ),
+        sourceUrl,
+        status: leadStatus(row.status),
+      });
+    }
+    return { searchId, fallback: table.fallback === true, rows };
   } catch {
     return null;
   }

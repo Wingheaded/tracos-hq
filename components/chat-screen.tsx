@@ -1,9 +1,19 @@
 "use client";
 
+import { LeadTable } from "@/components/lead-table";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AGENTS, CHANNELS, USERS, type Channel, type UserName } from "@/lib/constants";
-import { consultedNames, mentionedSpecialists, noteOffer, type Message, type NoteOffer, type SpecialistStreamEvent } from "@/lib/message";
+import {
+  consultedNames,
+  leadTable,
+  mentionedSpecialists,
+  mentionsLeads,
+  noteOffer,
+  type Message,
+  type NoteOffer,
+  type SpecialistStreamEvent,
+} from "@/lib/message";
 
 const speakerListeners = new Set<() => void>();
 
@@ -79,6 +89,7 @@ export function ChatScreen() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [offerBusy, setOfferBusy] = useState<number | null>(null);
+  const [leadBusy, setLeadBusy] = useState<number | null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef(channel);
@@ -185,6 +196,34 @@ export function ChatScreen() {
     }
   }
 
+  async function proposeLeads(messageId: number, ids: number[]) {
+    setLeadBusy(messageId);
+    setSendError(null);
+    const target = channel;
+    try {
+      const response = await fetch("/api/leads/propose", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, leadIds: ids, createdBy: author }),
+      });
+      const data = (await response.json()) as { error?: string; warning?: string };
+      if (!response.ok) throw new Error(data.error ?? "Não foi possível propor as leads.");
+      if (channelRef.current !== target) return;
+      const listed = await fetch(`/api/messages?channel=${target}`);
+      const payload = (await listed.json()) as { messages?: Message[]; error?: string };
+      if (!listed.ok) throw new Error(payload.error ?? "Não foi possível carregar as mensagens.");
+      if (channelRef.current !== target) return;
+      setLoaded({ channel: target, messages: payload.messages ?? [], error: null });
+      if (data.warning) setSendError(data.warning);
+    } catch (cause: unknown) {
+      if (channelRef.current === target) {
+        setSendError(cause instanceof Error ? cause.message : "Não foi possível propor as leads.");
+      }
+    } finally {
+      setLeadBusy(null);
+    }
+  }
+
   async function sendMessage() {
     const content = draft.trim();
     if (!content || sending) return;
@@ -246,6 +285,59 @@ export function ChatScreen() {
         if (!streamed.ok) {
           const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
           throw new Error(failure.error ?? "O especialista não conseguiu responder.");
+        }
+
+        await readSpecialistStream(streamed, (event) => {
+          if (channelRef.current !== target || generation.current !== generationAtStart) return;
+          if (event.type === "error") throw new Error(event.error);
+          setLoaded((current) => {
+            if (!current || current.channel !== target) return current;
+            return {
+              ...current,
+              messages: current.messages.map((message) => {
+                if (message.id !== tempId) return message;
+                if (event.type === "status") return { ...message, status: event.text };
+                if (event.type === "delta") return { ...message, status: undefined, content: message.content + event.text };
+                if (event.type === "message") return event.message;
+                return message;
+              }),
+            };
+          });
+        });
+      }
+      if (target === "leads" && mentionsLeads(content)) {
+        if (channelRef.current !== target || generation.current !== generationAtStart) return;
+        const tempId = --pendingId.current;
+        setLoaded((current) => {
+          if (!current || current.channel !== target) return current;
+          return {
+            ...current,
+            messages: [
+              ...current.messages,
+              {
+                id: tempId,
+                channel: target,
+                author: "Leads",
+                author_type: "agent",
+                content: "",
+                meta_json: null,
+                created_at: new Date().toISOString(),
+                pending: true,
+                status: "A pesquisar na internet…",
+              },
+            ],
+          };
+        });
+
+        const streamed = await fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ channel: target, author, content }),
+          signal: abort.signal,
+        });
+        if (!streamed.ok) {
+          const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
+          throw new Error(failure.error ?? "O Leads não conseguiu pesquisar.");
         }
 
         await readSpecialistStream(streamed, (event) => {
@@ -339,13 +431,16 @@ export function ChatScreen() {
             <p className="py-8 text-sm text-muted">A carregar mensagens…</p>
           ) : messages.length === 0 ? (
             <p className="max-w-md py-8 text-sm leading-6 text-muted">
-              Ainda não há mensagens em {active.label}. Menciona @Echo ou um especialista: @Daniel, @Tomás, @Maya, @André, @Inês.
+              {active.id === "leads"
+                ? "Ainda não há mensagens em #leads. Menciona @Leads, por exemplo: encontra hotéis no Algarve que renovaram recentemente."
+                : `Ainda não há mensagens em ${active.label}. Menciona @Echo ou um especialista: @Daniel, @Tomás, @Maya, @André, @Inês.`}
             </p>
           ) : (
             <ol>
               {messages.map((message) => {
                 const consulted = consultedNames(message.meta_json);
                 const offer = noteOffer(message.meta_json);
+                const table = leadTable(message.meta_json);
                 return (
                   <li key={message.id} className="grid grid-cols-[6.5rem_1fr] gap-3 border-b border-line/80 py-3">
                     <div>
@@ -366,6 +461,13 @@ export function ChatScreen() {
                       ) : (
                         <p className="whitespace-pre-wrap text-[15px] leading-6">{message.content}</p>
                       )}
+                      {table ? (
+                        <LeadTable
+                          rows={table.rows}
+                          busy={leadBusy === message.id}
+                          onPropose={(ids) => void proposeLeads(message.id, ids)}
+                        />
+                      ) : null}
                       {consulted.length > 0 ? (
                         <p className="mt-1 text-xs text-muted">Consultados: {consulted.join(", ")}</p>
                       ) : null}
@@ -417,7 +519,11 @@ export function ChatScreen() {
               value={draft}
               rows={2}
               aria-label={`Mensagem em ${active.label}`}
-              placeholder={`Mensagem em ${active.label}. Menciona @Echo ou um especialista.`}
+              placeholder={
+                active.id === "leads"
+                  ? "Mensagem em #leads. Menciona @Leads."
+                  : `Mensagem em ${active.label}. Menciona @Echo ou um especialista.`
+              }
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {

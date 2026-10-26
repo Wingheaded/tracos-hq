@@ -253,13 +253,42 @@ export async function createCrmActivity(payload: {
   return id;
 }
 
-export async function createCrmOrganization(payload: { name: string; city?: string; website?: string }): Promise<number> {
+let organizationContactKeys: { phone: string; email: string } | null = null;
+
+async function organizationContactFieldKeys(): Promise<{ phone: string; email: string }> {
+  if (organizationContactKeys) return organizationContactKeys;
+  const fields = asList(await pipedriveGet("organizationFields"));
+  const keyFor = (name: string) => {
+    const field = fields.find((item) => typeof item.name === "string" && item.name.trim().toLowerCase() === name);
+    return typeof field?.key === "string" && field.key ? field.key : null;
+  };
+  const phone = keyFor("phone");
+  const email = keyFor("email");
+  if (!phone || !email) throw new Error("O Pipedrive não tem telefone ou email na organização.");
+  organizationContactKeys = { phone, email };
+  return organizationContactKeys;
+}
+
+export async function createCrmOrganization(payload: {
+  name: string;
+  city?: string;
+  website?: string;
+  phone?: string;
+  email?: string;
+}): Promise<number> {
+  const contactFields: Record<string, string> = {};
+  if (payload.phone || payload.email) {
+    const keys = await organizationContactFieldKeys();
+    if (payload.phone) contactFields[keys.phone] = payload.phone;
+    if (payload.email) contactFields[keys.email] = payload.email;
+  }
   const data = await pipedriveRequest("organizations", {
     method: "POST",
     body: definedFields({
       name: payload.name,
       address: payload.city,
       website: payload.website,
+      ...contactFields,
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
@@ -267,13 +296,19 @@ export async function createCrmOrganization(payload: { name: string; city?: stri
   return id;
 }
 
-export async function createCrmPerson(payload: { name: string; org_id: number; email?: string }): Promise<number> {
+export async function createCrmPerson(payload: {
+  name: string;
+  org_id: number;
+  email?: string;
+  phone?: string;
+}): Promise<number> {
   const data = await pipedriveRequest("persons", {
     method: "POST",
     body: definedFields({
       name: payload.name,
       org_id: payload.org_id,
       email: payload.email ? [{ value: payload.email, primary: true, label: "work" }] : undefined,
+      phone: payload.phone ? [{ value: payload.phone, primary: true, label: "work" }] : undefined,
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);

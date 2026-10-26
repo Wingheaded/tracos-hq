@@ -52,20 +52,31 @@ CREATE TABLE IF NOT EXISTS leads (
   source_url TEXT,
   status TEXT
 );
+
+CREATE TABLE IF NOT EXISTS searches (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  query TEXT NOT NULL,
+  created_by TEXT,
+  created_at TEXT NOT NULL,
+  fallback INTEGER NOT NULL DEFAULT 0,
+  message_id INTEGER
+);
 `;
 
 const globalForDb = globalThis as unknown as { sqlite?: Database.Database };
 
 export function getDb() {
-  if (globalForDb.sqlite) return globalForDb.sqlite;
+  if (globalForDb.sqlite) {
+    globalForDb.sqlite.exec(SCHEMA);
+    return globalForDb.sqlite;
+  }
 
   const dir = path.join(process.cwd(), "data");
   fs.mkdirSync(dir, { recursive: true });
 
   const db = new Database(path.join(dir, "app.db"));
   db.pragma("journal_mode = WAL");
-  db.exec(SCHEMA);
-
   globalForDb.sqlite = db;
+  db.exec(SCHEMA);
   return db;
 }

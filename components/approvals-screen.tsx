@@ -1,5 +1,6 @@
 "use client";
 
+import { LeadsAdmin } from "@/components/leads-admin";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import type { ApprovalRecord } from "@/lib/approval";
@@ -67,6 +68,7 @@ export function ApprovalsScreen() {
   const [busy, setBusy] = useState<string | null>(null);
   const [leadForm, setLeadForm] = useState({ company: "", city: "", contact: "", website: "" });
   const [duplicate, setDuplicate] = useState<{ message: string; messageId: number; noteOffer: NoteOffer } | null>(null);
+  const [tab, setTab] = useState<"approvals" | "leads">("approvals");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -217,9 +219,24 @@ export function ApprovalsScreen() {
 
       <main className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div role="tablist" aria-label="Administração">
-            <button type="button" role="tab" aria-selected="true" className="border-b-2 border-olive px-1 pb-2 text-sm font-medium">
+          <div role="tablist" aria-label="Administração" className="flex gap-4">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "approvals"}
+              onClick={() => setTab("approvals")}
+              className={`border-b-2 px-1 pb-2 text-sm font-medium ${tab === "approvals" ? "border-olive" : "border-transparent text-muted"}`}
+            >
               Aprovações
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "leads"}
+              onClick={() => setTab("leads")}
+              className={`border-b-2 px-1 pb-2 text-sm font-medium ${tab === "leads" ? "border-olive" : "border-transparent text-muted"}`}
+            >
+              Leads
             </button>
           </div>
           <label className="flex items-center gap-2 text-sm text-muted" htmlFor="decider">
@@ -239,6 +256,9 @@ export function ApprovalsScreen() {
           </label>
         </div>
 
+        {tab === "leads" ? <LeadsAdmin /> : null}
+        {tab === "approvals" ? (
+        <>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted">Notas, atividades e leads do CRM pendentes. Nada é escrito no Pipedrive até aprovares.</p>
           <button
@@ -330,6 +350,8 @@ export function ApprovalsScreen() {
             <ApprovalList title="Decididas" items={decided} busy={busy} onDecide={decide} />
           </div>
         )}
+        </>
+        ) : null}
       </main>
     </div>
   );

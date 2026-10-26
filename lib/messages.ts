@@ -91,6 +91,18 @@ export function insertAgentMessage(input: {
     .get(inserted.lastInsertRowid) as Message;
 }
 
+export function readMessage(id: number): Message | null {
+  if (!Number.isInteger(id) || id <= 0) return null;
+  const row = getDb()
+    .prepare(
+      `SELECT id, channel, author, author_type, content, meta_json, created_at
+       FROM messages
+       WHERE id = ?`,
+    )
+    .get(id) as Message | undefined;
+  return row ?? null;
+}
+
 export function markNoteOfferProposed(messageId: number) {
   if (!Number.isInteger(messageId) || messageId <= 0) return;
   const db = getDb();

@@ -4,6 +4,7 @@ import { duplicateMessage, isApprovalType, type ApprovalRecord, type ApprovalTyp
 import type { Channel } from "@/lib/constants";
 import { getDb } from "@/lib/db";
 import type { NoteOffer } from "@/lib/message";
+import { setLeadStatus } from "@/lib/lead-records";
 import { insertAgentMessage } from "@/lib/messages";
 import {
   createCrmActivity,
@@ -98,6 +99,7 @@ function normalizePayload(type: ApprovalType, payload: unknown): Record<string, 
     email: emails[0],
     organization_id: positiveId(record.organization_id, "organization"),
     person_id: positiveId(record.person_id, "person"),
+    lead_row_id: positiveId(record.lead_row_id, "lead"),
   };
 }
 
@@ -235,18 +237,38 @@ function savePendingPayload(id: number, payload: Record<string, unknown>) {
     .run(JSON.stringify(payload), id);
 }
 
-function personName(contact: string | undefined, email: string | undefined, company: string): string {
-  const withoutEmail = (contact ?? "")
-    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "")
-    .replace(/[<>(),;]/g, " ")
+const GENERIC_EMAIL =
+  /^(info|reservas|reservations|hello|contact|contacts|geral|general|rececao|recepção|reception|office|mail|booking|bookings|stay|hotel|comercial|sales|welcome|enquiry|enquiries)@/i;
+const PHONE_NUMBER = /\+?\d[\d\s()./-]{7,}\d/;
+
+function phoneNumber(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const match = value.match(PHONE_NUMBER);
+  if (!match) return undefined;
+  const digits = match[0].replace(/\D/g, "");
+  if (digits.length < 9 || digits.length > 15) return undefined;
+  return match[0].replace(/\s+/g, " ").trim();
+}
+
+export function classifyLeadContact(contact: string | undefined, emailField?: string): {
+  name?: string;
+  phone?: string;
+  email?: string;
+} {
+  const email = collectEmails(emailField, contact)[0];
+  const phone = phoneNumber(contact);
+  const name = (contact ?? "")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, " ")
+    .replace(new RegExp(PHONE_NUMBER.source, "g"), " ")
+    .replace(/\b(tel\.?|telefone|phone|e-?mail|email|contacto|contato)\b/gi, " ")
+    .replace(/[<>(),;|/]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  if (withoutEmail.length >= 2) return withoutEmail;
-  if (email) {
-    const local = email.split("@")[0]?.replace(/[._-]+/g, " ").trim();
-    if (local && local.length >= 2) return local;
+  const person = /\p{L}/u.test(name) && name.length >= 2 ? name : undefined;
+  if (!person || (email !== undefined && GENERIC_EMAIL.test(email) && person.toLowerCase() === email.split("@")[0]?.toLowerCase())) {
+    return { phone, email };
   }
-  return company;
+  return { name: person, phone, email };
 }
 
 function websiteForCrm(value: string | undefined): string | undefined {
@@ -281,7 +303,9 @@ async function createInPipedrive(type: ApprovalType, approvalId: number, payload
 
   const next = { ...normalized };
   const company = requiredText(next.company ?? next.title, "company");
-  const emails = collectEmails(next.email, next.contact);
+  const contact = optionalText(next.contact);
+  const leadContact = classifyLeadContact(contact, optionalText(next.email));
+  const emails = collectEmails(leadContact.email);
   let organizationId = positiveId(next.organization_id, "organization");
   if (!organizationId) {
     const duplicate = await findCrmDuplicate({
@@ -294,18 +318,20 @@ async function createInPipedrive(type: ApprovalType, approvalId: number, payload
       name: company,
       city: optionalText(next.city),
       website: websiteForCrm(optionalText(next.website)),
+      phone: leadContact.name ? undefined : leadContact.phone,
+      email: leadContact.name ? undefined : leadContact.email,
     });
     next.organization_id = organizationId;
     savePendingPayload(approvalId, next);
   }
 
-  const contact = optionalText(next.contact);
   let personId = positiveId(next.person_id, "person");
-  if (!personId && (contact || emails.length > 0)) {
+  if (!personId && leadContact.name) {
     personId = await createCrmPerson({
-      name: personName(contact, emails[0], company),
+      name: leadContact.name,
       org_id: organizationId,
-      email: emails[0],
+      email: leadContact.email,
+      phone: leadContact.phone,
     });
     next.person_id = personId;
     savePendingPayload(approvalId, next);
@@ -349,6 +375,12 @@ export async function decideApproval(
   if (result.changes === 0) throw new Error("Esta aprovação já foi decidida.");
   const updated = readApproval(id);
   if (!updated) throw new Error("A aprovação não foi encontrada.");
+  if (updated.type === "lead") {
+    const rowId = updated.payload.lead_row_id;
+    if (typeof rowId === "number" && Number.isInteger(rowId) && rowId > 0) {
+      setLeadStatus(rowId, decision === "approve" ? "sent" : "new");
+    }
+  }
   return updated;
 }
 

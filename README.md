@@ -34,6 +34,17 @@ The five specialists answer only from the brands' catalogues (`kit/catalog/`). P
 - **No duplicates.** Before any lead is proposed, the server checks Pipedrive for the same company name (case and accents ignored), email or website domain.
 - **Safe data.** The demo runs on a Pipedrive test account with fictional clients, fictional invoices and public company news. No personal data is collected from the web.
 
+## Why a custom app and not only Grok Bot
+
+The lab offered three tools: Cursor, Grok Bot and the xAI API. We used Cursor to build and the xAI API to run the agents. We chose not to build Traços HQ as a set of Grok Bot assistants, because an assistant can do much of the work (answer from the catalogues, search the web, read a CRM when it is connected to one) but it cannot by itself guarantee the parts that make this safe for a team:
+
+- **Rules enforced in code, not in a prompt.** Human approval before any CRM write and the duplicate check run on the server every time. With an assistant they depend on the model following its instructions. During testing the Orchestrator proposed a client visit nobody had asked for; the approval queue, not the model, kept it out of Pipedrive.
+- **One door to the CRM.** Only the Orchestrator writes to Pipedrive. Several assistants connected to the CRM would each write on their own.
+- **One shared workspace.** Paulo, Nelson and José see the same channels, approvals and leads. Assistants are usually personal to each user.
+- **Control of data and cost.** The catalogues, prices and history stay with Traços, and the AI model can be changed later without rebuilding the app.
+
+Grok Bot fits the personal side of the roadmap: an email assistant for each colleague that sorts priorities and drafts replies, handing anything that belongs in the CRM to Traços HQ.
+
 ## Demo
 
 1. In `#clients`: *"@Orchestrator Vou visitar a Casa Maré na quinta-feira. Têm um problema de eco no lobby e querem um bar no rooftop. Sugere iluminação, acústica e mobiliário de exterior."* The Orchestrator reads the CRM, consults Daniel, Tomás and Maya, and returns one proposal by area.

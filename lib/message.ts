@@ -14,6 +14,7 @@ export type Message = {
 
 export type SpecialistStreamEvent =
   | { type: "delta"; text: string }
+  | { type: "status"; text: string }
   | { type: "message"; message: Message }
   | { type: "error"; error: string };
 

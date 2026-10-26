@@ -38,7 +38,7 @@ function formatTime(iso: string) {
   });
 }
 
-type ChatMessage = Message & { pending?: boolean };
+type ChatMessage = Message & { pending?: boolean; status?: string };
 
 const EMPTY_MESSAGES: ChatMessage[] = [];
 
@@ -231,6 +231,7 @@ export function ChatScreen() {
                 meta_json: null,
                 created_at: new Date().toISOString(),
                 pending: true,
+                status: `${agent} está a escrever…`,
               },
             ],
           };
@@ -256,7 +257,8 @@ export function ChatScreen() {
               ...current,
               messages: current.messages.map((message) => {
                 if (message.id !== tempId) return message;
-                if (event.type === "delta") return { ...message, content: message.content + event.text };
+                if (event.type === "status") return { ...message, status: event.text };
+                if (event.type === "delta") return { ...message, status: undefined, content: message.content + event.text };
                 if (event.type === "message") return event.message;
                 return message;
               }),
@@ -353,9 +355,17 @@ export function ChatScreen() {
                       </time>
                     </div>
                     <div className={message.author_type === "agent" ? "border-l-2 border-olive pl-3" : undefined}>
-                      <p className="whitespace-pre-wrap text-[15px] leading-6">
-                        {message.content || (message.pending ? "…" : "")}
-                      </p>
+                      {message.author_type === "agent" && message.pending && message.status && !message.content ? (
+                        <p className="flex items-center gap-2 text-xs text-muted">
+                          <span
+                            className="size-1.5 shrink-0 rounded-full bg-current motion-safe:animate-pulse"
+                            aria-hidden="true"
+                          />
+                          {message.status}
+                        </p>
+                      ) : (
+                        <p className="whitespace-pre-wrap text-[15px] leading-6">{message.content}</p>
+                      )}
                       {consulted.length > 0 ? (
                         <p className="mt-1 text-xs text-muted">Consultados: {consulted.join(", ")}</p>
                       ) : null}
@@ -422,7 +432,7 @@ export function ChatScreen() {
               disabled={sending || draft.trim().length === 0}
               className="rounded-md bg-brass px-4 py-2 text-sm font-medium text-olive disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
             >
-              {sending ? "A enviar…" : "Enviar"}
+              {sending ? "A pensar…" : "Enviar"}
             </button>
           </div>
           {error ? <p className="mt-2 text-sm text-olive">{error}</p> : null}

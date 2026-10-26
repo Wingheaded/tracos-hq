@@ -112,7 +112,7 @@ export function parsePostBody(body: unknown):
   | { ok: true; channel: Channel; author: UserName; content: string }
   | { ok: false; error: string } {
   if (!body || typeof body !== "object") {
-    return { ok: false, error: "Message body is missing." };
+    return { ok: false, error: "Falta o conteúdo da mensagem." };
   }
 
   const record = body as Record<string, unknown>;
@@ -120,11 +120,11 @@ export function parsePostBody(body: unknown):
   const author = typeof record.author === "string" ? record.author : "";
   const content = typeof record.content === "string" ? record.content.trim() : "";
 
-  if (!isChannel(channel)) return { ok: false, error: "Unknown channel." };
-  if (!isUserName(author)) return { ok: false, error: "Unknown speaker." };
-  if (!content) return { ok: false, error: "Write a message before sending." };
+  if (!isChannel(channel)) return { ok: false, error: "Canal desconhecido." };
+  if (!isUserName(author)) return { ok: false, error: "Quem fala não é reconhecido." };
+  if (!content) return { ok: false, error: "Escreve uma mensagem antes de enviar." };
   if (content.length > 4000) {
-    return { ok: false, error: "Message is too long (4000 characters)." };
+    return { ok: false, error: "A mensagem é demasiado longa (4000 caracteres)." };
   }
 
   return { ok: true, channel, author, content };

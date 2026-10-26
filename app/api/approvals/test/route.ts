@@ -10,14 +10,14 @@ export async function POST(request: Request) {
   }
   const createdBy = body && typeof body === "object" ? (body as { createdBy?: unknown }).createdBy : undefined;
   if (typeof createdBy !== "string" || !isUserName(createdBy)) {
-    return Response.json({ error: "Choose who is proposing the approval." }, { status: 400 });
+    return Response.json({ error: "Escolhe quem propõe a aprovação." }, { status: 400 });
   }
 
   try {
     const approval = await proposeCasaMareVisit(createdBy);
     return Response.json({ approval }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not create the test approval.";
+    const message = error instanceof Error ? error.message : "Não foi possível criar a aprovação de teste.";
     return Response.json({ error: message }, { status: 502 });
   }
 }

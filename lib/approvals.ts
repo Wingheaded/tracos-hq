@@ -26,14 +26,14 @@ const TEST_SUBJECT = "Visit Casa Maré on Thursday";
 function positiveId(value: unknown, label: string): number | undefined {
   if (value === undefined || value === null || value === "") return undefined;
   if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
-    throw new Error(`Approval ${label} is invalid.`);
+    throw new Error(`O campo ${label} da aprovação é inválido.`);
   }
   return value;
 }
 
 function requiredText(value: unknown, label: string): string {
   if (typeof value !== "string" || value.trim().length === 0) {
-    throw new Error(`Approval ${label} is missing.`);
+    throw new Error(`Falta o campo ${label} na aprovação.`);
   }
   return value.trim();
 }
@@ -59,7 +59,7 @@ function optionalLeadId(value: unknown): string | undefined {
 
 function normalizePayload(type: ApprovalType, payload: unknown): Record<string, unknown> {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error("Approval payload is missing.");
+    throw new Error("Falta o conteúdo da aprovação.");
   }
   const record = payload as Record<string, unknown>;
   if (type === "note") {
@@ -71,7 +71,7 @@ function normalizePayload(type: ApprovalType, payload: unknown): Record<string, 
       lead_id: optionalLeadId(record.lead_id),
     };
     if (!note.org_id && !note.deal_id && !note.person_id && !note.lead_id) {
-      throw new Error("A note needs a record to attach to.");
+      throw new Error("Uma nota precisa de um registo onde ficar.");
     }
     return note;
   }
@@ -136,16 +136,16 @@ function noteTarget(match: CrmMatch): Pick<NoteOffer, "org_id" | "person_id" | "
   if (match.kind === "organization" && typeof match.id === "number") return { org_id: match.id };
   if (match.kind === "person" && typeof match.id === "number") return { person_id: match.id };
   if (match.kind === "lead") return { lead_id: String(match.id) };
-  throw new Error("The Pipedrive match has no record to attach a note to.");
+  throw new Error("Este resultado do Pipedrive não tem um registo para a nota.");
 }
 
 function leadNote(payload: Record<string, unknown>, matches: readonly CrmMatch[]): string {
   const lines = [duplicateMessage(matches)];
   for (const [label, key] of [
-    ["Company", "company"],
-    ["City", "city"],
-    ["Contact", "contact"],
-    ["Website", "website"],
+    ["Empresa", "company"],
+    ["Cidade", "city"],
+    ["Contacto", "contact"],
+    ["Site", "website"],
   ] as const) {
     const value = optionalText(payload[key]);
     if (value) lines.push(`${label}: ${value}`);
@@ -325,8 +325,8 @@ export async function decideApproval(
   decidedBy: string,
 ): Promise<ApprovalRecord> {
   const current = readApproval(id);
-  if (!current) throw new Error("Approval was not found.");
-  if (current.status !== "pending") throw new Error("This approval is already decided.");
+  if (!current) throw new Error("A aprovação não foi encontrada.");
+  if (current.status !== "pending") throw new Error("Esta aprovação já foi decidida.");
 
   let payload = current.payload;
   if (decision === "approve") {
@@ -346,9 +346,9 @@ export async function decideApproval(
       decided_at: new Date().toISOString(),
       payload_json: JSON.stringify(payload),
     });
-  if (result.changes === 0) throw new Error("This approval is already decided.");
+  if (result.changes === 0) throw new Error("Esta aprovação já foi decidida.");
   const updated = readApproval(id);
-  if (!updated) throw new Error("Approval was not found.");
+  if (!updated) throw new Error("A aprovação não foi encontrada.");
   return updated;
 }
 
@@ -364,10 +364,10 @@ function upcomingThursday(from = new Date()): string {
 export async function proposeCasaMareVisit(createdBy?: string): Promise<ApprovalRecord> {
   const matches = await crmSearch("Casa Maré");
   const organization = matches.find((match) => match.type === "organization" && /casa maré/i.test(match.name));
-  if (!organization) throw new Error("Casa Maré was not found in Pipedrive.");
+  if (!organization) throw new Error("A Casa Maré não foi encontrada no Pipedrive.");
   const client = await crmGetClient(organization.id);
   const deal = client.deals.find((item) => item.status === "open") ?? client.deals[0];
-  if (!deal) throw new Error("Casa Maré has no deal.");
+  if (!deal) throw new Error("A Casa Maré não tem um negócio.");
 
   const result = await proposeCrmWrite(
     "activity",
@@ -378,9 +378,9 @@ export async function proposeCasaMareVisit(createdBy?: string): Promise<Approval
       org_id: organization.id,
       deal_id: deal.id,
     },
-    `Test activity for ${deal.title}.`,
+    `Atividade de teste para ${deal.title}.`,
     createdBy,
   );
-  if (result.status !== "pending") throw new Error("Could not create the test approval.");
+  if (result.status !== "pending") throw new Error("Não foi possível criar a aprovação de teste.");
   return result.approval;
 }

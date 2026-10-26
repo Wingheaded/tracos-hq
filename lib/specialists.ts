@@ -3,6 +3,7 @@ import path from "node:path";
 import OpenAI from "openai";
 import { SPECIALISTS, type SpecialistName } from "@/lib/constants";
 import type { Channel } from "@/lib/constants";
+import { prefersEnglish, REPLY_LANGUAGE_RULE } from "@/lib/locale";
 import { insertAgentMessage } from "@/lib/messages";
 import type { Message } from "@/lib/message";
 
@@ -39,19 +40,24 @@ function firstBrand(catalogJson: string) {
   return brand;
 }
 
-export function placeholderReply(brand: string) {
-  return `Placeholder. The first brand in my catalog is "${brand}".`;
+export function placeholderReply(brand: string, content = "") {
+  if (prefersEnglish(content)) return `Placeholder. The first brand in my catalog is "${brand}".`;
+  return `Resposta de recurso. A primeira marca do meu catálogo é "${brand}".`;
 }
 
 function systemPrompt(specialist: Specialist, catalogJson: string) {
   const templatePath = path.join(process.cwd(), "kit", "prompts", "specialist.md");
   const template = fs.readFileSync(templatePath, "utf8");
-  const body = template.split(/\n---\n/).slice(1).join("\n---\n").trim();
-  return body
+  const body = template
+    .split(/\n---\n/)
+    .slice(1)
+    .join("\n---\n")
+    .trim()
     .replaceAll("{{name}}", specialist.name)
     .replaceAll("{{segment}}", specialist.segment)
     .replaceAll("{{human_owner}}", specialist.humanOwner)
     .replaceAll("{{catalog_json}}", catalogJson.trim());
+  return `${body}\n\n${REPLY_LANGUAGE_RULE}`;
 }
 
 function keyIsUsable(key: string | undefined): key is string {
@@ -87,7 +93,7 @@ export async function answerSpecialist(input: {
 }): Promise<Message> {
   const specialist = specialistByName(input.agent);
   const catalog = readCatalog(specialist);
-  const fallback = placeholderReply(firstBrand(catalog));
+  const fallback = placeholderReply(firstBrand(catalog), input.content);
   const apiKey = process.env.XAI_API_KEY;
   const model = process.env.XAI_MODEL?.trim();
 

@@ -4,7 +4,7 @@ import { listMessages, parsePostBody, postHumanMessage } from "@/lib/messages";
 export async function GET(request: Request) {
   const channel = new URL(request.url).searchParams.get("channel") ?? "";
   if (!isChannel(channel)) {
-    return Response.json({ error: "Unknown channel." }, { status: 400 });
+    return Response.json({ error: "Canal desconhecido." }, { status: 400 });
   }
 
   return Response.json(
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Message body is not valid JSON." }, { status: 400 });
+    return Response.json({ error: "O pedido não é JSON válido." }, { status: 400 });
   }
 
   const parsed = parsePostBody(body);

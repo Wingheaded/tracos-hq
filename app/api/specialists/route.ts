@@ -7,11 +7,11 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Message body is not valid JSON." }, { status: 400 });
+    return Response.json({ error: "O pedido não é JSON válido." }, { status: 400 });
   }
 
   if (!body || typeof body !== "object") {
-    return Response.json({ error: "Message body is missing." }, { status: 400 });
+    return Response.json({ error: "Falta o conteúdo da mensagem." }, { status: 400 });
   }
 
   const record = body as Record<string, unknown>;
@@ -19,11 +19,11 @@ export async function POST(request: Request) {
   const agent = typeof record.agent === "string" ? record.agent : "";
   const content = typeof record.content === "string" ? record.content.trim() : "";
 
-  if (!isChannel(channel)) return Response.json({ error: "Unknown channel." }, { status: 400 });
-  if (!isSpecialistName(agent)) return Response.json({ error: "Unknown specialist." }, { status: 400 });
-  if (!content) return Response.json({ error: "Write a message before sending." }, { status: 400 });
+  if (!isChannel(channel)) return Response.json({ error: "Canal desconhecido." }, { status: 400 });
+  if (!isSpecialistName(agent)) return Response.json({ error: "Especialista desconhecido." }, { status: 400 });
+  if (!content) return Response.json({ error: "Escreve uma mensagem antes de enviar." }, { status: 400 });
   if (!mentionedSpecialists(content).includes(agent)) {
-    return Response.json({ error: "That specialist was not mentioned." }, { status: 400 });
+    return Response.json({ error: "Esse especialista não foi mencionado." }, { status: 400 });
   }
 
   const encoder = new TextEncoder();
@@ -55,9 +55,9 @@ export async function POST(request: Request) {
             wake = null;
           },
           (error: unknown) => {
-            const detail = error instanceof Error ? error.message : "The specialist could not answer.";
+            const detail = error instanceof Error ? error.message : "O especialista não conseguiu responder.";
             const safe = /api key|bearer|authorization/i.test(detail)
-              ? "The xAI request failed."
+              ? "O pedido ao modelo falhou."
               : detail.slice(0, 300);
             send({ type: "error", error: safe });
             settled = true;

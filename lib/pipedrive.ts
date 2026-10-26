@@ -54,7 +54,7 @@ function config(): PipedriveConfig {
   const domain = process.env.PIPEDRIVE_DOMAIN?.trim();
   const token = process.env.PIPEDRIVE_API_TOKEN?.trim();
   if (!domain || !token) {
-    throw new Error("Pipedrive is not configured.");
+    throw new Error("O Pipedrive não está configurado.");
   }
   const host = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
   const origin = host.includes(".") ? `https://${host}` : `https://${host}.pipedrive.com`;
@@ -88,8 +88,8 @@ async function pipedriveRequest(
   const record = body && typeof body === "object" ? (body as { success?: boolean; data?: unknown; error?: unknown }) : null;
   if (!response.ok || !record?.success) {
     const detail = typeof record?.error === "string" && !/api_token|token/i.test(record.error) ? record.error : null;
-    if (response.status === 404) throw new Error(detail ?? "Pipedrive client was not found.");
-    throw new Error(detail ?? `Pipedrive request failed (${response.status}).`);
+    if (response.status === 404) throw new Error(detail ?? "O cliente não foi encontrado no Pipedrive.");
+    throw new Error(detail ?? `O pedido ao Pipedrive falhou (${response.status}).`);
   }
   return record.data;
 }
@@ -222,7 +222,7 @@ export async function createCrmNote(payload: {
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
-  if (id === null) throw new Error("Pipedrive did not return a note id.");
+  if (id === null) throw new Error("O Pipedrive não devolveu o id da nota.");
   return id;
 }
 
@@ -249,7 +249,7 @@ export async function createCrmActivity(payload: {
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
-  if (id === null) throw new Error("Pipedrive did not return an activity id.");
+  if (id === null) throw new Error("O Pipedrive não devolveu o id da atividade.");
   return id;
 }
 
@@ -263,7 +263,7 @@ export async function createCrmOrganization(payload: { name: string; city?: stri
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
-  if (id === null) throw new Error("Pipedrive did not return an organization id.");
+  if (id === null) throw new Error("O Pipedrive não devolveu o id da organização.");
   return id;
 }
 
@@ -277,7 +277,7 @@ export async function createCrmPerson(payload: { name: string; org_id: number; e
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
-  if (id === null) throw new Error("Pipedrive did not return a person id.");
+  if (id === null) throw new Error("O Pipedrive não devolveu o id da pessoa.");
   return id;
 }
 
@@ -295,7 +295,7 @@ export async function createCrmLead(payload: {
     }),
   });
   const id = crmId(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
-  if (id === null) throw new Error("Pipedrive did not return a lead id.");
+  if (id === null) throw new Error("O Pipedrive não devolveu o id da lead.");
   return id;
 }
 
@@ -484,7 +484,7 @@ export async function crmSearch(query: string): Promise<CrmSearchHit[]> {
 
 export async function crmGetClient(orgId: number): Promise<CrmClient> {
   if (!Number.isInteger(orgId) || orgId <= 0) {
-    throw new Error("Pipedrive client was not found.");
+    throw new Error("O cliente não foi encontrado no Pipedrive.");
   }
 
   const [organization, deals, notes, activities] = await Promise.all([

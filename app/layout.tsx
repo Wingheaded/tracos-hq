@@ -14,12 +14,12 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Traços HQ",
-  description: "Internal workspace for Traços Interiores",
+  description: "Espaço interno da Traços Interiores",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${outfit.variable} ${fraunces.variable} h-full`}>
+    <html lang="pt-PT" className={`${outfit.variable} ${fraunces.variable} h-full`}>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

@@ -30,7 +30,12 @@ function chooseSpeaker(next: UserName) {
 function formatTime(iso: string) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("pt-PT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: "Europe/Lisbon",
+  });
 }
 
 type ChatMessage = Message & { pending?: boolean };
@@ -47,7 +52,7 @@ async function readSpecialistStream(
   response: Response,
   onEvent: (event: SpecialistStreamEvent) => void,
 ) {
-  if (!response.body) throw new Error("The specialist reply had no stream.");
+  if (!response.body) throw new Error("A resposta não chegou.");
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -102,7 +107,7 @@ export function ChatScreen() {
     fetch(`/api/messages?channel=${requested}`, { signal: controller.signal })
       .then(async (response) => {
         const data = (await response.json()) as { messages?: Message[]; error?: string };
-        if (!response.ok) throw new Error(data.error ?? "Could not load messages.");
+        if (!response.ok) throw new Error(data.error ?? "Não foi possível carregar as mensagens.");
         if (generation.current !== generationAtStart) return;
         setLoaded({ channel: requested, messages: data.messages ?? [], error: null });
       })
@@ -112,7 +117,7 @@ export function ChatScreen() {
         setLoaded({
           channel: requested,
           messages: [],
-          error: cause instanceof Error ? cause.message : "Could not load messages.",
+          error: cause instanceof Error ? cause.message : "Não foi possível carregar as mensagens.",
         });
       });
 
@@ -153,14 +158,14 @@ export function ChatScreen() {
             person_id: offer.person_id,
             lead_id: offer.lead_id,
           },
-          reason: "Note on an existing Pipedrive record.",
+          reason: "Nota sobre um registo que já está no Pipedrive.",
           createdBy: author,
           channel,
           messageId: message.id,
         }),
       });
       const data = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(data.error ?? "Could not propose the note.");
+      if (!response.ok) throw new Error(data.error ?? "Não foi possível propor a nota.");
       setLoaded((current) => {
         if (!current) return current;
         return {
@@ -174,7 +179,7 @@ export function ChatScreen() {
         };
       });
     } catch (cause: unknown) {
-      setSendError(cause instanceof Error ? cause.message : "Could not propose the note.");
+      setSendError(cause instanceof Error ? cause.message : "Não foi possível propor a nota.");
     } finally {
       setOfferBusy(null);
     }
@@ -199,11 +204,11 @@ export function ChatScreen() {
         signal: abort.signal,
       });
       const data = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(data.error ?? "Could not send the message.");
+      if (!response.ok) throw new Error(data.error ?? "Não foi possível enviar a mensagem.");
 
       const listed = await fetch(`/api/messages?channel=${target}`, { signal: abort.signal });
       const payload = (await listed.json()) as { messages?: Message[]; error?: string };
-      if (!listed.ok) throw new Error(payload.error ?? "Could not load messages.");
+      if (!listed.ok) throw new Error(payload.error ?? "Não foi possível carregar as mensagens.");
       if (channelRef.current !== target || generation.current !== generationAtStart) return;
       setLoaded({ channel: target, messages: payload.messages ?? [], error: null });
       setDraft("");
@@ -239,7 +244,7 @@ export function ChatScreen() {
         });
         if (!streamed.ok) {
           const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
-          throw new Error(failure.error ?? "The specialist could not answer.");
+          throw new Error(failure.error ?? "O especialista não conseguiu responder.");
         }
 
         await readSpecialistStream(streamed, (event) => {
@@ -262,7 +267,7 @@ export function ChatScreen() {
     } catch (cause: unknown) {
       if (cause instanceof DOMException && cause.name === "AbortError") return;
       if (channelRef.current === target) {
-        setSendError(cause instanceof Error ? cause.message : "Could not send the message.");
+        setSendError(cause instanceof Error ? cause.message : "Não foi possível enviar a mensagem.");
       }
     } finally {
       if (replyAbort.current === abort) {
@@ -277,13 +282,13 @@ export function ChatScreen() {
       <aside className="flex shrink-0 flex-col border-b border-olive-2 bg-olive text-mist md:w-64 md:border-b-0 md:border-r">
         <div className="px-4 py-4">
           <p className="font-display text-[1.7rem] leading-none text-white">Traços</p>
-          <p className="mt-1 text-sm text-mist/75">Internal workspace</p>
+          <p className="mt-1 text-sm text-mist/75">Espaço interno</p>
           <Link href="/admin" className="mt-3 inline-block text-sm text-mist/80 underline-offset-2 hover:text-white hover:underline">
-            Approvals
+            Aprovações
           </Link>
         </div>
 
-        <nav aria-label="Channels" className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:px-2">
+        <nav aria-label="Canais" className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:px-2">
           {CHANNELS.map((item) => {
             const selected = item.id === channel;
             return (
@@ -303,7 +308,7 @@ export function ChatScreen() {
         </nav>
 
         <div className="hidden min-h-0 flex-1 flex-col px-2 pb-3 md:flex">
-          <p className="px-2 pt-3 pb-1 text-sm text-mist/60">Agents</p>
+          <p className="px-2 pt-3 pb-1 text-sm text-mist/60">Agentes</p>
           <ul className="min-h-0 flex-1 space-y-0.5 overflow-y-auto">
             {AGENTS.map((agent) => (
               <li key={agent.name}>
@@ -329,10 +334,10 @@ export function ChatScreen() {
 
         <div ref={threadRef} className="min-h-0 flex-1 overflow-y-auto px-4 py-2 md:px-6">
           {loading ? (
-            <p className="py-8 text-sm text-muted">Loading messages…</p>
+            <p className="py-8 text-sm text-muted">A carregar mensagens…</p>
           ) : messages.length === 0 ? (
             <p className="max-w-md py-8 text-sm leading-6 text-muted">
-              No messages in {active.label} yet. Mention @Echo, or a specialist: @Daniel, @Tomás, @Maya, @André, @Inês.
+              Ainda não há mensagens em {active.label}. Menciona @Echo ou um especialista: @Daniel, @Tomás, @Maya, @André, @Inês.
             </p>
           ) : (
             <ol>
@@ -352,10 +357,10 @@ export function ChatScreen() {
                         {message.content || (message.pending ? "…" : "")}
                       </p>
                       {consulted.length > 0 ? (
-                        <p className="mt-1 text-xs text-muted">Consulted: {consulted.join(", ")}</p>
+                        <p className="mt-1 text-xs text-muted">Consultados: {consulted.join(", ")}</p>
                       ) : null}
                       {offer?.proposed ? (
-                        <p className="mt-2 text-sm text-muted">Note proposed. It is waiting in Approvals.</p>
+                        <p className="mt-2 text-sm text-muted">Nota proposta. Está à espera nas Aprovações.</p>
                       ) : offer ? (
                         <button
                           type="button"
@@ -363,7 +368,7 @@ export function ChatScreen() {
                           disabled={offerBusy === message.id}
                           className="mt-2 rounded-md bg-brass px-3 py-1.5 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
                         >
-                          {offerBusy === message.id ? "Proposing…" : "Propose a note"}
+                          {offerBusy === message.id ? "A propor…" : "Propor uma nota"}
                         </button>
                       ) : null}
                     </div>
@@ -382,7 +387,7 @@ export function ChatScreen() {
           }}
         >
           <label className="mb-2 flex items-center gap-2 text-sm text-muted" htmlFor="speaker">
-            Speaking as
+            A falar como
             <select
               id="speaker"
               value={author}
@@ -401,8 +406,8 @@ export function ChatScreen() {
               ref={composerRef}
               value={draft}
               rows={2}
-              aria-label={`Message ${active.label}`}
-              placeholder={`Message ${active.label}. Mention @Echo or a specialist.`}
+              aria-label={`Mensagem em ${active.label}`}
+              placeholder={`Mensagem em ${active.label}. Menciona @Echo ou um especialista.`}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
@@ -417,7 +422,7 @@ export function ChatScreen() {
               disabled={sending || draft.trim().length === 0}
               className="rounded-md bg-brass px-4 py-2 text-sm font-medium text-olive disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
             >
-              {sending ? "Sending…" : "Send"}
+              {sending ? "A enviar…" : "Enviar"}
             </button>
           </div>
           {error ? <p className="mt-2 text-sm text-olive">{error}</p> : null}

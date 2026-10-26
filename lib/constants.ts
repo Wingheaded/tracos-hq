@@ -1,8 +1,8 @@
 export const CHANNELS = [
-  { id: "general", label: "#general", hint: "Team channel" },
-  { id: "clients", label: "#clients", hint: "Client work" },
-  { id: "finance", label: "#finance", hint: "Invoices and expenses" },
-  { id: "leads", label: "#leads", hint: "Prospect research" },
+  { id: "general", label: "#general", hint: "Canal da equipa" },
+  { id: "clients", label: "#clients", hint: "Trabalho com clientes" },
+  { id: "finance", label: "#finance", hint: "Faturas e despesas" },
+  { id: "leads", label: "#leads", hint: "Prospeção" },
 ] as const;
 
 export type Channel = (typeof CHANNELS)[number]["id"];
@@ -12,15 +12,15 @@ export const USERS = ["Paulo", "Nelson", "José"] as const;
 export type UserName = (typeof USERS)[number];
 
 export const AGENTS = [
-  { name: "Echo", detail: "Replies when mentioned" },
-  { name: "Orchestrator", detail: "Manager" },
-  { name: "Daniel", detail: "Lighting" },
-  { name: "Tomás", detail: "Acoustics" },
-  { name: "Maya", detail: "Outdoor" },
-  { name: "André", detail: "Workplace" },
-  { name: "Inês", detail: "Biophilia" },
-  { name: "Finance", detail: "Invoices" },
-  { name: "Leads", detail: "Prospects" },
+  { name: "Echo", detail: "Responde quando é mencionado" },
+  { name: "Orchestrator", detail: "Gestor" },
+  { name: "Daniel", detail: "Iluminação" },
+  { name: "Tomás", detail: "Acústica" },
+  { name: "Maya", detail: "Exterior" },
+  { name: "André", detail: "Escritórios" },
+  { name: "Inês", detail: "Biofilia" },
+  { name: "Finance", detail: "Faturas" },
+  { name: "Leads", detail: "Prospeção" },
 ] as const;
 
 export const SPECIALISTS = [

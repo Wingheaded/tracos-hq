@@ -33,10 +33,13 @@ function textValue(payload: Record<string, unknown>, key: string) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+const TYPE_LABEL = { note: "nota", activity: "atividade", lead: "lead" } as const;
+const STATUS_LABEL = { pending: "pendente", approved: "aprovada", rejected: "rejeitada" } as const;
+
 function headline(approval: ApprovalRecord) {
-  if (approval.type === "activity") return textValue(approval.payload, "subject") ?? "Activity";
+  if (approval.type === "activity") return textValue(approval.payload, "subject") ?? "Atividade";
   if (approval.type === "lead") return textValue(approval.payload, "company") ?? textValue(approval.payload, "title") ?? "Lead";
-  return textValue(approval.payload, "content") ?? "Note";
+  return textValue(approval.payload, "content") ?? "Nota";
 }
 
 function detail(approval: ApprovalRecord) {
@@ -49,7 +52,7 @@ function detail(approval: ApprovalRecord) {
   if (contact) parts.push(contact);
   const website = textValue(approval.payload, "website");
   if (website) parts.push(website);
-  if (typeof approval.payload.deal_id === "number") parts.push(`deal ${approval.payload.deal_id}`);
+  if (typeof approval.payload.deal_id === "number") parts.push(`negócio ${approval.payload.deal_id}`);
   const pipedriveId = approval.payload.pipedrive_id;
   if (typeof pipedriveId === "number" || (typeof pipedriveId === "string" && pipedriveId.trim())) {
     parts.push(`Pipedrive #${pipedriveId}`);
@@ -70,12 +73,12 @@ export function ApprovalsScreen() {
     fetch("/api/approvals", { signal: controller.signal })
       .then(async (response) => {
         const data = (await response.json()) as { approvals?: ApprovalRecord[]; error?: string };
-        if (!response.ok) throw new Error(data.error ?? "Could not load approvals.");
+        if (!response.ok) throw new Error(data.error ?? "Não foi possível carregar as aprovações.");
         setApprovals(data.approvals ?? []);
       })
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;
-        setError(cause instanceof Error ? cause.message : "Could not load approvals.");
+        setError(cause instanceof Error ? cause.message : "Não foi possível carregar as aprovações.");
         setApprovals([]);
       });
     return () => controller.abort();
@@ -91,10 +94,10 @@ export function ApprovalsScreen() {
         body: JSON.stringify({ createdBy: actor }),
       });
       const data = (await response.json()) as { approval?: ApprovalRecord; error?: string };
-      if (!response.ok || !data.approval) throw new Error(data.error ?? "Could not create the test approval.");
+      if (!response.ok || !data.approval) throw new Error(data.error ?? "Não foi possível criar a aprovação de teste.");
       setApprovals((current) => [data.approval!, ...(current ?? [])]);
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Could not create the test approval.");
+      setError(cause instanceof Error ? cause.message : "Não foi possível criar a aprovação de teste.");
     } finally {
       setBusy(null);
     }
@@ -119,7 +122,7 @@ export function ApprovalsScreen() {
             contact: leadForm.contact.trim(),
             website: leadForm.website.trim(),
           },
-          reason: `New lead for ${company}.`,
+          reason: `Nova lead para ${company}.`,
           createdBy: actor,
           channel: "leads",
         }),
@@ -129,16 +132,16 @@ export function ApprovalsScreen() {
         duplicate?: { message: string; messageId: number; noteOffer: NoteOffer };
         error?: string;
       };
-      if (!response.ok) throw new Error(data.error ?? "Could not add the lead.");
+      if (!response.ok) throw new Error(data.error ?? "Não foi possível adicionar a lead.");
       if (data.duplicate) {
         setDuplicate(data.duplicate);
         return;
       }
-      if (!data.approval) throw new Error("Could not add the lead.");
+      if (!data.approval) throw new Error("Não foi possível adicionar a lead.");
       setApprovals((current) => [data.approval!, ...(current ?? [])]);
       setLeadForm({ company: "", city: "", contact: "", website: "" });
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Could not add the lead.");
+      setError(cause instanceof Error ? cause.message : "Não foi possível adicionar a lead.");
     } finally {
       setBusy(null);
     }
@@ -160,17 +163,17 @@ export function ApprovalsScreen() {
             person_id: duplicate.noteOffer.person_id,
             lead_id: duplicate.noteOffer.lead_id,
           },
-          reason: "Note on an existing Pipedrive record.",
+          reason: "Nota sobre um registo que já está no Pipedrive.",
           createdBy: actor,
           messageId: duplicate.messageId,
         }),
       });
       const data = (await response.json()) as { approval?: ApprovalRecord; error?: string };
-      if (!response.ok || !data.approval) throw new Error(data.error ?? "Could not propose the note.");
+      if (!response.ok || !data.approval) throw new Error(data.error ?? "Não foi possível propor a nota.");
       setApprovals((current) => [data.approval!, ...(current ?? [])]);
       setDuplicate({ ...duplicate, noteOffer: { ...duplicate.noteOffer, proposed: true } });
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Could not propose the note.");
+      setError(cause instanceof Error ? cause.message : "Não foi possível propor a nota.");
     } finally {
       setBusy(null);
     }
@@ -186,10 +189,10 @@ export function ApprovalsScreen() {
         body: JSON.stringify({ decision, decidedBy: actor }),
       });
       const data = (await response.json()) as { approval?: ApprovalRecord; error?: string };
-      if (!response.ok || !data.approval) throw new Error(data.error ?? "Could not decide the approval.");
+      if (!response.ok || !data.approval) throw new Error(data.error ?? "Não foi possível decidir a aprovação.");
       setApprovals((current) => (current ?? []).map((item) => (item.id === id ? data.approval! : item)));
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Could not decide the approval.");
+      setError(cause instanceof Error ? cause.message : "Não foi possível decidir a aprovação.");
     } finally {
       setBusy(null);
     }
@@ -204,23 +207,23 @@ export function ApprovalsScreen() {
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
           <div>
             <p className="font-display text-2xl leading-none text-white">Traços</p>
-            <p className="mt-1 text-sm text-mist/75">Back office</p>
+            <p className="mt-1 text-sm text-mist/75">Administração</p>
           </div>
           <Link href="/" className="text-sm text-white underline-offset-2 hover:underline">
-            Chat
+            Conversa
           </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div role="tablist" aria-label="Back office">
+          <div role="tablist" aria-label="Administração">
             <button type="button" role="tab" aria-selected="true" className="border-b-2 border-olive px-1 pb-2 text-sm font-medium">
-              Approvals
+              Aprovações
             </button>
           </div>
           <label className="flex items-center gap-2 text-sm text-muted" htmlFor="decider">
-            Speaking as
+            A falar como
             <select
               id="decider"
               value={actor}
@@ -237,21 +240,21 @@ export function ApprovalsScreen() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted">Pending CRM notes, activities, and leads. Nothing is written until you approve.</p>
+          <p className="text-sm text-muted">Notas, atividades e leads do CRM pendentes. Nada é escrito no Pipedrive até aprovares.</p>
           <button
             type="button"
             onClick={() => void createTest()}
             disabled={busy !== null}
             className="rounded-md border border-olive px-3 py-2 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
           >
-            {busy === "test" ? "Creating…" : "Create test approval"}
+            {busy === "test" ? "A criar…" : "Criar aprovação de teste"}
           </button>
         </div>
 
         <form onSubmit={(event) => void addLead(event)} className="mt-6 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
-          <h2 className="text-sm font-medium sm:col-span-2">Add lead</h2>
+          <h2 className="text-sm font-medium sm:col-span-2">Adicionar lead</h2>
           <label className="text-sm text-muted">
-            Company
+            Empresa
             <input
               value={leadForm.company}
               onChange={(event) => setLeadForm((current) => ({ ...current, company: event.target.value }))}
@@ -260,7 +263,7 @@ export function ApprovalsScreen() {
             />
           </label>
           <label className="text-sm text-muted">
-            City
+            Cidade
             <input
               value={leadForm.city}
               onChange={(event) => setLeadForm((current) => ({ ...current, city: event.target.value }))}
@@ -268,7 +271,7 @@ export function ApprovalsScreen() {
             />
           </label>
           <label className="text-sm text-muted">
-            Contact
+            Contacto
             <input
               value={leadForm.contact}
               onChange={(event) => setLeadForm((current) => ({ ...current, contact: event.target.value }))}
@@ -276,7 +279,7 @@ export function ApprovalsScreen() {
             />
           </label>
           <label className="text-sm text-muted">
-            Website
+            Site
             <input
               value={leadForm.website}
               onChange={(event) => setLeadForm((current) => ({ ...current, website: event.target.value }))}
@@ -289,7 +292,7 @@ export function ApprovalsScreen() {
               disabled={busy !== null}
               className="rounded-md border border-olive px-3 py-2 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
             >
-              {busy === "lead" ? "Adding…" : "Add lead"}
+              {busy === "lead" ? "A adicionar…" : "Adicionar lead"}
             </button>
           </div>
         </form>
@@ -297,9 +300,9 @@ export function ApprovalsScreen() {
         {duplicate ? (
           <div className="mt-4">
             <p className="text-sm leading-6">{duplicate.message}</p>
-            <p className="mt-1 text-sm text-muted">Also posted in #leads.</p>
+            <p className="mt-1 text-sm text-muted">Também publicado em #leads.</p>
             {duplicate.noteOffer.proposed ? (
-              <p className="mt-2 text-sm text-muted">Note proposed. It is waiting in Approvals.</p>
+              <p className="mt-2 text-sm text-muted">Nota proposta. Está à espera nas Aprovações.</p>
             ) : (
               <button
                 type="button"
@@ -307,7 +310,7 @@ export function ApprovalsScreen() {
                 disabled={busy !== null}
                 className="mt-2 rounded-md bg-brass px-3 py-1.5 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
               >
-                {busy === "note" ? "Proposing…" : "Propose a note"}
+                {busy === "note" ? "A propor…" : "Propor uma nota"}
               </button>
             )}
           </div>
@@ -316,15 +319,15 @@ export function ApprovalsScreen() {
         {error ? <p className="mt-3 text-sm text-olive">{error}</p> : null}
 
         {approvals === null ? (
-          <p className="mt-8 text-sm text-muted">Loading approvals…</p>
+          <p className="mt-8 text-sm text-muted">A carregar aprovações…</p>
         ) : pending.length === 0 && decided.length === 0 ? (
           <p className="mt-8 max-w-md text-sm leading-6 text-muted">
-            No approvals yet. Create a test activity for the Casa Maré deal.
+            Ainda não há aprovações. Cria uma atividade de teste para o negócio da Casa Maré.
           </p>
         ) : (
           <div className="mt-6 space-y-8">
-            <ApprovalList title="Pending" items={pending} busy={busy} onDecide={decide} />
-            <ApprovalList title="Decided" items={decided} busy={busy} onDecide={decide} />
+            <ApprovalList title="Pendentes" items={pending} busy={busy} onDecide={decide} />
+            <ApprovalList title="Decididas" items={decided} busy={busy} onDecide={decide} />
           </div>
         )}
       </main>
@@ -353,7 +356,7 @@ function ApprovalList({
           return (
             <li key={approval.id} className="py-4">
               <p className="text-xs text-muted">
-                {approval.type} · {approval.status}
+                {TYPE_LABEL[approval.type]} · {STATUS_LABEL[approval.status]}
                 {approval.created_by ? ` · ${approval.created_by}` : ""}
               </p>
               <p className="mt-1 text-[15px] leading-6">{headline(approval)}</p>
@@ -367,7 +370,7 @@ function ApprovalList({
                     disabled={busy !== null}
                     className="rounded-md bg-brass px-3 py-1.5 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
                   >
-                    {busy === `approve-${approval.id}` ? "Approving…" : "Approve"}
+                    {busy === `approve-${approval.id}` ? "A aprovar…" : "Aprovar"}
                   </button>
                   <button
                     type="button"
@@ -375,11 +378,11 @@ function ApprovalList({
                     disabled={busy !== null}
                     className="rounded-md border border-line px-3 py-1.5 text-sm disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
                   >
-                    {busy === `reject-${approval.id}` ? "Rejecting…" : "Reject"}
+                    {busy === `reject-${approval.id}` ? "A rejeitar…" : "Rejeitar"}
                   </button>
                 </div>
               ) : approval.decided_by ? (
-                <p className="mt-2 text-xs text-muted">Decided by {approval.decided_by}</p>
+                <p className="mt-2 text-xs text-muted">Decidida por {approval.decided_by}</p>
               ) : null}
             </li>
           );

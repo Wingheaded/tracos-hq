@@ -28,8 +28,10 @@ export type CrmMatch = {
   name: string;
 };
 
+const MATCH_KIND = { organization: "organização", person: "pessoa", lead: "lead" } as const;
+
 export function duplicateMessage(match: CrmMatch | readonly CrmMatch[]): string {
-  const matches = Array.isArray(match) ? match : [match];
-  const detail = matches.map((item) => `${item.name} (${item.kind} ${item.id})`).join(", ");
-  return `Already in Pipedrive: ${detail}`;
+  const matches: readonly CrmMatch[] = Array.isArray(match) ? match : [match];
+  const detail = matches.map((item) => `${item.name} (${MATCH_KIND[item.kind]} ${item.id})`).join(", ");
+  return `Já está no Pipedrive: ${detail}`;
 }

@@ -1,8 +1,25 @@
 import "server-only";
 
+import { duplicateMessage, isApprovalType, type ApprovalRecord, type ApprovalType, type CrmMatch } from "@/lib/approval";
+import type { Channel } from "@/lib/constants";
 import { getDb } from "@/lib/db";
-import { isApprovalType, type ApprovalRecord, type ApprovalType } from "@/lib/approval";
-import { createCrmActivity, createCrmLead, createCrmNote, crmGetClient, crmSearch } from "@/lib/pipedrive";
+import type { NoteOffer } from "@/lib/message";
+import { insertAgentMessage } from "@/lib/messages";
+import {
+  createCrmActivity,
+  createCrmLead,
+  createCrmNote,
+  createCrmOrganization,
+  createCrmPerson,
+  crmGetClient,
+  crmSearch,
+  findCrmDuplicate,
+  websiteHost,
+} from "@/lib/pipedrive";
+
+export type ProposeCrmResult =
+  | { status: "pending"; approval: ApprovalRecord }
+  | { status: "duplicate"; message: string; match: CrmMatch; noteOffer: NoteOffer; messageId: number };
 
 const TEST_SUBJECT = "Visit Casa Maré on Thursday";
 
@@ -21,18 +38,42 @@ function requiredText(value: unknown, label: string): string {
   return value.trim();
 }
 
+function optionalText(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function collectEmails(...values: unknown[]): string[] {
+  const found: string[] = [];
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    for (const match of value.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) found.push(match[0].toLowerCase());
+  }
+  return [...new Set(found)];
+}
+
+function optionalLeadId(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
 function normalizePayload(type: ApprovalType, payload: unknown): Record<string, unknown> {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new Error("Approval payload is missing.");
   }
   const record = payload as Record<string, unknown>;
   if (type === "note") {
-    return {
+    const note = {
       content: requiredText(record.content, "note"),
       org_id: positiveId(record.org_id, "organization"),
       deal_id: positiveId(record.deal_id, "deal"),
       person_id: positiveId(record.person_id, "person"),
+      lead_id: optionalLeadId(record.lead_id),
     };
+    if (!note.org_id && !note.deal_id && !note.person_id && !note.lead_id) {
+      throw new Error("A note needs a record to attach to.");
+    }
+    return note;
   }
   if (type === "activity") {
     return {
@@ -45,15 +86,18 @@ function normalizePayload(type: ApprovalType, payload: unknown): Record<string, 
       note: typeof record.note === "string" ? record.note.trim() : undefined,
     };
   }
-  const organizationId = positiveId(record.organization_id, "organization");
-  const personId = positiveId(record.person_id, "person");
-  if (!organizationId && !personId) {
-    throw new Error("A lead needs an organization or a person.");
-  }
+  const company = requiredText(record.company ?? record.title, "company");
+  const contact = optionalText(record.contact);
+  const emails = collectEmails(record.email, contact);
   return {
-    title: requiredText(record.title, "title"),
-    organization_id: organizationId,
-    person_id: personId,
+    title: optionalText(record.title) ?? company,
+    company,
+    city: optionalText(record.city),
+    contact,
+    website: optionalText(record.website),
+    email: emails[0],
+    organization_id: positiveId(record.organization_id, "organization"),
+    person_id: positiveId(record.person_id, "person"),
   };
 }
 
@@ -88,13 +132,28 @@ function rowToApproval(row: {
   };
 }
 
-export function proposeCrmWrite(
-  type: ApprovalType,
-  payload: unknown,
-  reason: string,
-  createdBy?: string,
-): ApprovalRecord {
-  const normalized = normalizePayload(type, payload);
+function noteTarget(match: CrmMatch): Pick<NoteOffer, "org_id" | "person_id" | "lead_id"> {
+  if (match.kind === "organization" && typeof match.id === "number") return { org_id: match.id };
+  if (match.kind === "person" && typeof match.id === "number") return { person_id: match.id };
+  if (match.kind === "lead") return { lead_id: String(match.id) };
+  throw new Error("The Pipedrive match has no record to attach a note to.");
+}
+
+function leadNote(payload: Record<string, unknown>, matches: readonly CrmMatch[]): string {
+  const lines = [duplicateMessage(matches)];
+  for (const [label, key] of [
+    ["Company", "company"],
+    ["City", "city"],
+    ["Contact", "contact"],
+    ["Website", "website"],
+  ] as const) {
+    const value = optionalText(payload[key]);
+    if (value) lines.push(`${label}: ${value}`);
+  }
+  return lines.join("\n");
+}
+
+function insertPending(type: ApprovalType, payload: Record<string, unknown>, reason: string, createdBy?: string): ApprovalRecord {
   const db = getDb();
   const inserted = db
     .prepare(
@@ -103,7 +162,7 @@ export function proposeCrmWrite(
     )
     .run({
       type,
-      payload_json: JSON.stringify(normalized),
+      payload_json: JSON.stringify(payload),
       reason: reason.trim() || null,
       created_by: createdBy?.trim() || null,
       created_at: new Date().toISOString(),
@@ -112,6 +171,52 @@ export function proposeCrmWrite(
     typeof rowToApproval
   >[0];
   return rowToApproval(row);
+}
+
+export async function proposeCrmWrite(
+  type: ApprovalType,
+  payload: unknown,
+  reason: string,
+  createdBy?: string,
+  channel: Channel = "leads",
+): Promise<ProposeCrmResult> {
+  const normalized = normalizePayload(type, payload);
+  if (type === "lead") {
+    const groups = await findCrmDuplicate({
+      company: optionalText(normalized.company),
+      emails: collectEmails(normalized.email, normalized.contact),
+      website: optionalText(normalized.website),
+    });
+    if (groups.length > 0) {
+      let first: ProposeCrmResult | null = null;
+      for (const group of groups) {
+        const primary = group.find((match) => match.kind === "organization") ?? group[0];
+        const offer: NoteOffer = {
+          content: leadNote(normalized, group),
+          label: primary.name,
+          ...noteTarget(primary),
+          proposed: false,
+        };
+        const message = duplicateMessage(group);
+        const existing = getDb()
+          .prepare(
+            `SELECT id FROM messages WHERE channel = ? AND author = 'Leads' AND content = ? ORDER BY id DESC LIMIT 1`,
+          )
+          .get(channel, message) as { id: number } | undefined;
+        const messageId = existing
+          ? existing.id
+          : insertAgentMessage({
+              channel,
+              author: "Leads",
+              content: message,
+              meta: { noteOffer: offer },
+            }).id;
+        if (!first) first = { status: "duplicate", message, match: primary, noteOffer: offer, messageId };
+      }
+      if (first) return first;
+    }
+  }
+  return { status: "pending", approval: insertPending(type, normalized, reason, createdBy) };
 }
 
 export function listApprovals(): ApprovalRecord[] {
@@ -124,18 +229,45 @@ function readApproval(id: number): ApprovalRecord | null {
   return row ? rowToApproval(row) : null;
 }
 
-async function createInPipedrive(type: ApprovalType, payload: Record<string, unknown>): Promise<number> {
+function savePendingPayload(id: number, payload: Record<string, unknown>) {
+  getDb()
+    .prepare(`UPDATE approvals SET payload_json = ? WHERE id = ? AND status = 'pending'`)
+    .run(JSON.stringify(payload), id);
+}
+
+function personName(contact: string | undefined, email: string | undefined, company: string): string {
+  const withoutEmail = (contact ?? "")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "")
+    .replace(/[<>(),;]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (withoutEmail.length >= 2) return withoutEmail;
+  if (email) {
+    const local = email.split("@")[0]?.replace(/[._-]+/g, " ").trim();
+    if (local && local.length >= 2) return local;
+  }
+  return company;
+}
+
+function websiteForCrm(value: string | undefined): string | undefined {
+  if (!value || !websiteHost(value)) return undefined;
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(value) ? value : `https://${value}`;
+}
+
+async function createInPipedrive(type: ApprovalType, approvalId: number, payload: Record<string, unknown>): Promise<Record<string, unknown>> {
   const normalized = normalizePayload(type, payload);
   if (type === "note") {
-    return createCrmNote({
+    const id = await createCrmNote({
       content: String(normalized.content),
       org_id: normalized.org_id as number | undefined,
       deal_id: normalized.deal_id as number | undefined,
       person_id: normalized.person_id as number | undefined,
+      lead_id: optionalText(normalized.lead_id),
     });
+    return { ...normalized, pipedrive_id: id };
   }
   if (type === "activity") {
-    return createCrmActivity({
+    const id = await createCrmActivity({
       subject: String(normalized.subject),
       type: String(normalized.type),
       due_date: typeof normalized.due_date === "string" ? normalized.due_date : undefined,
@@ -144,12 +276,47 @@ async function createInPipedrive(type: ApprovalType, payload: Record<string, unk
       person_id: normalized.person_id as number | undefined,
       note: typeof normalized.note === "string" ? normalized.note : undefined,
     });
+    return { ...normalized, pipedrive_id: id };
   }
-  return createCrmLead({
-    title: String(normalized.title),
-    organization_id: normalized.organization_id as number | undefined,
-    person_id: normalized.person_id as number | undefined,
+
+  const next = { ...normalized };
+  const company = requiredText(next.company ?? next.title, "company");
+  const emails = collectEmails(next.email, next.contact);
+  let organizationId = positiveId(next.organization_id, "organization");
+  if (!organizationId) {
+    const duplicate = await findCrmDuplicate({
+      company,
+      emails,
+      website: optionalText(next.website),
+    });
+    if (duplicate.length > 0) throw new Error(duplicate.map((group) => duplicateMessage(group)).join("\n"));
+    organizationId = await createCrmOrganization({
+      name: company,
+      city: optionalText(next.city),
+      website: websiteForCrm(optionalText(next.website)),
+    });
+    next.organization_id = organizationId;
+    savePendingPayload(approvalId, next);
+  }
+
+  const contact = optionalText(next.contact);
+  let personId = positiveId(next.person_id, "person");
+  if (!personId && (contact || emails.length > 0)) {
+    personId = await createCrmPerson({
+      name: personName(contact, emails[0], company),
+      org_id: organizationId,
+      email: emails[0],
+    });
+    next.person_id = personId;
+    savePendingPayload(approvalId, next);
+  }
+
+  const leadId = await createCrmLead({
+    title: optionalText(next.title) ?? company,
+    organization_id: organizationId,
+    person_id: personId,
   });
+  return { ...next, organization_id: organizationId, person_id: personId, pipedrive_id: leadId };
 }
 
 export async function decideApproval(
@@ -163,8 +330,7 @@ export async function decideApproval(
 
   let payload = current.payload;
   if (decision === "approve") {
-    const pipedriveId = await createInPipedrive(current.type, current.payload);
-    payload = { ...current.payload, pipedrive_id: pipedriveId };
+    payload = await createInPipedrive(current.type, current.id, current.payload);
   }
 
   const result = getDb()
@@ -203,7 +369,7 @@ export async function proposeCasaMareVisit(createdBy?: string): Promise<Approval
   const deal = client.deals.find((item) => item.status === "open") ?? client.deals[0];
   if (!deal) throw new Error("Casa Maré has no deal.");
 
-  return proposeCrmWrite(
+  const result = await proposeCrmWrite(
     "activity",
     {
       subject: TEST_SUBJECT,
@@ -215,4 +381,6 @@ export async function proposeCasaMareVisit(createdBy?: string): Promise<Approval
     `Test activity for ${deal.title}.`,
     createdBy,
   );
+  if (result.status !== "pending") throw new Error("Could not create the test approval.");
+  return result.approval;
 }

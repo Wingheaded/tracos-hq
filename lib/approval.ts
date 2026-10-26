@@ -19,3 +19,17 @@ export type ApprovalRecord = {
 export function isApprovalType(value: string): value is ApprovalType {
   return (APPROVAL_TYPES as readonly string[]).includes(value);
 }
+
+export type CrmMatchKind = "organization" | "person" | "lead";
+
+export type CrmMatch = {
+  kind: CrmMatchKind;
+  id: number | string;
+  name: string;
+};
+
+export function duplicateMessage(match: CrmMatch | readonly CrmMatch[]): string {
+  const matches = Array.isArray(match) ? match : [match];
+  const detail = matches.map((item) => `${item.name} (${item.kind} ${item.id})`).join(", ");
+  return `Already in Pipedrive: ${detail}`;
+}

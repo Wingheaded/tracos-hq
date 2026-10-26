@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import type { ApprovalRecord } from "@/lib/approval";
 import { USERS, type UserName } from "@/lib/constants";
+import type { NoteOffer } from "@/lib/message";
 
 const speakerListeners = new Set<() => void>();
 
@@ -34,7 +35,7 @@ function textValue(payload: Record<string, unknown>, key: string) {
 
 function headline(approval: ApprovalRecord) {
   if (approval.type === "activity") return textValue(approval.payload, "subject") ?? "Activity";
-  if (approval.type === "lead") return textValue(approval.payload, "title") ?? "Lead";
+  if (approval.type === "lead") return textValue(approval.payload, "company") ?? textValue(approval.payload, "title") ?? "Lead";
   return textValue(approval.payload, "content") ?? "Note";
 }
 
@@ -42,8 +43,17 @@ function detail(approval: ApprovalRecord) {
   const parts: string[] = [];
   const due = textValue(approval.payload, "due_date");
   if (due) parts.push(due);
+  const city = textValue(approval.payload, "city");
+  if (city) parts.push(city);
+  const contact = textValue(approval.payload, "contact");
+  if (contact) parts.push(contact);
+  const website = textValue(approval.payload, "website");
+  if (website) parts.push(website);
   if (typeof approval.payload.deal_id === "number") parts.push(`deal ${approval.payload.deal_id}`);
-  if (typeof approval.payload.pipedrive_id === "number") parts.push(`Pipedrive #${approval.payload.pipedrive_id}`);
+  const pipedriveId = approval.payload.pipedrive_id;
+  if (typeof pipedriveId === "number" || (typeof pipedriveId === "string" && pipedriveId.trim())) {
+    parts.push(`Pipedrive #${pipedriveId}`);
+  }
   return parts.join(" · ");
 }
 
@@ -52,6 +62,8 @@ export function ApprovalsScreen() {
   const [approvals, setApprovals] = useState<ApprovalRecord[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [leadForm, setLeadForm] = useState({ company: "", city: "", contact: "", website: "" });
+  const [duplicate, setDuplicate] = useState<{ message: string; messageId: number; noteOffer: NoteOffer } | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -83,6 +95,82 @@ export function ApprovalsScreen() {
       setApprovals((current) => [data.approval!, ...(current ?? [])]);
     } catch (cause: unknown) {
       setError(cause instanceof Error ? cause.message : "Could not create the test approval.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function addLead(event: FormEvent) {
+    event.preventDefault();
+    const company = leadForm.company.trim();
+    if (!company) return;
+    setBusy("lead");
+    setError(null);
+    setDuplicate(null);
+    try {
+      const response = await fetch("/api/approvals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "lead",
+          payload: {
+            company,
+            city: leadForm.city.trim(),
+            contact: leadForm.contact.trim(),
+            website: leadForm.website.trim(),
+          },
+          reason: `New lead for ${company}.`,
+          createdBy: actor,
+          channel: "leads",
+        }),
+      });
+      const data = (await response.json()) as {
+        approval?: ApprovalRecord;
+        duplicate?: { message: string; messageId: number; noteOffer: NoteOffer };
+        error?: string;
+      };
+      if (!response.ok) throw new Error(data.error ?? "Could not add the lead.");
+      if (data.duplicate) {
+        setDuplicate(data.duplicate);
+        return;
+      }
+      if (!data.approval) throw new Error("Could not add the lead.");
+      setApprovals((current) => [data.approval!, ...(current ?? [])]);
+      setLeadForm({ company: "", city: "", contact: "", website: "" });
+    } catch (cause: unknown) {
+      setError(cause instanceof Error ? cause.message : "Could not add the lead.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function proposeOfferedNote() {
+    if (!duplicate) return;
+    setBusy("note");
+    setError(null);
+    try {
+      const response = await fetch("/api/approvals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "note",
+          payload: {
+            content: duplicate.noteOffer.content,
+            org_id: duplicate.noteOffer.org_id,
+            person_id: duplicate.noteOffer.person_id,
+            lead_id: duplicate.noteOffer.lead_id,
+          },
+          reason: "Note on an existing Pipedrive record.",
+          createdBy: actor,
+          messageId: duplicate.messageId,
+        }),
+      });
+      const data = (await response.json()) as { approval?: ApprovalRecord; error?: string };
+      if (!response.ok || !data.approval) throw new Error(data.error ?? "Could not propose the note.");
+      setApprovals((current) => [data.approval!, ...(current ?? [])]);
+      setDuplicate({ ...duplicate, noteOffer: { ...duplicate.noteOffer, proposed: true } });
+    } catch (cause: unknown) {
+      setError(cause instanceof Error ? cause.message : "Could not propose the note.");
     } finally {
       setBusy(null);
     }
@@ -159,6 +247,71 @@ export function ApprovalsScreen() {
             {busy === "test" ? "Creating…" : "Create test approval"}
           </button>
         </div>
+
+        <form onSubmit={(event) => void addLead(event)} className="mt-6 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
+          <h2 className="text-sm font-medium sm:col-span-2">Add lead</h2>
+          <label className="text-sm text-muted">
+            Company
+            <input
+              value={leadForm.company}
+              onChange={(event) => setLeadForm((current) => ({ ...current, company: event.target.value }))}
+              required
+              className="mt-1 w-full rounded-md border border-line bg-white px-2 py-1.5 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            />
+          </label>
+          <label className="text-sm text-muted">
+            City
+            <input
+              value={leadForm.city}
+              onChange={(event) => setLeadForm((current) => ({ ...current, city: event.target.value }))}
+              className="mt-1 w-full rounded-md border border-line bg-white px-2 py-1.5 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            />
+          </label>
+          <label className="text-sm text-muted">
+            Contact
+            <input
+              value={leadForm.contact}
+              onChange={(event) => setLeadForm((current) => ({ ...current, contact: event.target.value }))}
+              className="mt-1 w-full rounded-md border border-line bg-white px-2 py-1.5 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            />
+          </label>
+          <label className="text-sm text-muted">
+            Website
+            <input
+              value={leadForm.website}
+              onChange={(event) => setLeadForm((current) => ({ ...current, website: event.target.value }))}
+              className="mt-1 w-full rounded-md border border-line bg-white px-2 py-1.5 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              disabled={busy !== null}
+              className="rounded-md border border-olive px-3 py-2 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            >
+              {busy === "lead" ? "Adding…" : "Add lead"}
+            </button>
+          </div>
+        </form>
+
+        {duplicate ? (
+          <div className="mt-4">
+            <p className="text-sm leading-6">{duplicate.message}</p>
+            <p className="mt-1 text-sm text-muted">Also posted in #leads.</p>
+            {duplicate.noteOffer.proposed ? (
+              <p className="mt-2 text-sm text-muted">Note proposed. It is waiting in Approvals.</p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void proposeOfferedNote()}
+                disabled={busy !== null}
+                className="mt-2 rounded-md bg-brass px-3 py-1.5 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
+              >
+                {busy === "note" ? "Proposing…" : "Propose a note"}
+              </button>
+            )}
+          </div>
+        ) : null}
 
         {error ? <p className="mt-3 text-sm text-olive">{error}</p> : null}
 

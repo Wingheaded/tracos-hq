@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AGENTS, CHANNELS, USERS, type Channel, type UserName } from "@/lib/constants";
-import { consultedNames, mentionedSpecialists, type Message, type SpecialistStreamEvent } from "@/lib/message";
+import { consultedNames, mentionedSpecialists, noteOffer, type Message, type NoteOffer, type SpecialistStreamEvent } from "@/lib/message";
 
 const speakerListeners = new Set<() => void>();
 
@@ -73,6 +73,7 @@ export function ChatScreen() {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [offerBusy, setOfferBusy] = useState<number | null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef(channel);
@@ -135,6 +136,48 @@ export function ChatScreen() {
   function openChannel(next: Channel) {
     setSendError(null);
     setChannel(next);
+  }
+
+  async function proposeNote(message: ChatMessage, offer: NoteOffer) {
+    setOfferBusy(message.id);
+    setSendError(null);
+    try {
+      const response = await fetch("/api/approvals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "note",
+          payload: {
+            content: offer.content,
+            org_id: offer.org_id,
+            person_id: offer.person_id,
+            lead_id: offer.lead_id,
+          },
+          reason: "Note on an existing Pipedrive record.",
+          createdBy: author,
+          channel,
+          messageId: message.id,
+        }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(data.error ?? "Could not propose the note.");
+      setLoaded((current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          messages: current.messages.map((item) => {
+            if (item.id !== message.id || !item.meta_json) return item;
+            const meta = JSON.parse(item.meta_json) as { noteOffer?: NoteOffer };
+            if (!meta.noteOffer) return item;
+            return { ...item, meta_json: JSON.stringify({ ...meta, noteOffer: { ...meta.noteOffer, proposed: true } }) };
+          }),
+        };
+      });
+    } catch (cause: unknown) {
+      setSendError(cause instanceof Error ? cause.message : "Could not propose the note.");
+    } finally {
+      setOfferBusy(null);
+    }
   }
 
   async function sendMessage() {
@@ -295,6 +338,7 @@ export function ChatScreen() {
             <ol>
               {messages.map((message) => {
                 const consulted = consultedNames(message.meta_json);
+                const offer = noteOffer(message.meta_json);
                 return (
                   <li key={message.id} className="grid grid-cols-[6.5rem_1fr] gap-3 border-b border-line/80 py-3">
                     <div>
@@ -309,6 +353,18 @@ export function ChatScreen() {
                       </p>
                       {consulted.length > 0 ? (
                         <p className="mt-1 text-xs text-muted">Consulted: {consulted.join(", ")}</p>
+                      ) : null}
+                      {offer?.proposed ? (
+                        <p className="mt-2 text-sm text-muted">Note proposed. It is waiting in Approvals.</p>
+                      ) : offer ? (
+                        <button
+                          type="button"
+                          onClick={() => void proposeNote(message, offer)}
+                          disabled={offerBusy === message.id}
+                          className="mt-2 rounded-md bg-brass px-3 py-1.5 text-sm font-medium text-olive disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive"
+                        >
+                          {offerBusy === message.id ? "Proposing…" : "Propose a note"}
+                        </button>
                       ) : null}
                     </div>
                   </li>

@@ -63,17 +63,23 @@ export function postHumanMessage(input: {
   return save(input.channel, input.author, input.content);
 }
 
-export function insertAgentMessage(input: { channel: Channel; author: string; content: string }): Message {
+export function insertAgentMessage(input: {
+  channel: Channel;
+  author: string;
+  content: string;
+  meta?: Record<string, unknown> | null;
+}): Message {
   const db = getDb();
   const inserted = db
     .prepare(
       `INSERT INTO messages (channel, author, author_type, content, meta_json, created_at)
-       VALUES (@channel, @author, 'agent', @content, NULL, @created_at)`,
+       VALUES (@channel, @author, 'agent', @content, @meta_json, @created_at)`,
     )
     .run({
       channel: input.channel,
       author: input.author,
       content: input.content,
+      meta_json: input.meta ? JSON.stringify(input.meta) : null,
       created_at: new Date().toISOString(),
     });
   return db
@@ -83,6 +89,23 @@ export function insertAgentMessage(input: { channel: Channel; author: string; co
        WHERE id = ?`,
     )
     .get(inserted.lastInsertRowid) as Message;
+}
+
+export function markNoteOfferProposed(messageId: number) {
+  if (!Number.isInteger(messageId) || messageId <= 0) return;
+  const db = getDb();
+  const row = db.prepare(`SELECT meta_json FROM messages WHERE id = ?`).get(messageId) as
+    | { meta_json: string | null }
+    | undefined;
+  if (!row?.meta_json) return;
+  try {
+    const meta = JSON.parse(row.meta_json) as { noteOffer?: { proposed?: boolean } };
+    if (!meta.noteOffer || typeof meta.noteOffer !== "object") return;
+    meta.noteOffer.proposed = true;
+    db.prepare(`UPDATE messages SET meta_json = ? WHERE id = ?`).run(JSON.stringify(meta), messageId);
+  } catch {
+    return;
+  }
 }
 
 export function parsePostBody(body: unknown):

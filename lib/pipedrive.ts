@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { CrmMatch } from "@/lib/approval";
+
 export type CrmSearchHit = {
   type: "organization" | "person";
   id: number;
@@ -137,11 +139,77 @@ function definedFields(fields: Record<string, unknown>): Record<string, unknown>
   return Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined && value !== null && value !== ""));
 }
 
+function crmId(value: unknown): string | null {
+  if (typeof value === "number" && Number.isInteger(value) && value > 0) return String(value);
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return null;
+}
+
+function foldName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sameCompanyName(left: string, right: string): boolean {
+  const a = foldName(left);
+  const b = foldName(right);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const shorter = a.length <= b.length ? a : b;
+  const longer = a.length <= b.length ? b : a;
+  return shorter.split(" ").length >= 2 && longer.startsWith(`${shorter} `);
+}
+
+export function websiteHost(value: string | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  try {
+    const withProtocol = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const host = new URL(withProtocol).hostname.replace(/^www\./i, "").replace(/\.$/, "").toLowerCase();
+    if (!host.includes(".") || host.length < 4) return null;
+    return host;
+  } catch {
+    return null;
+  }
+}
+
+function emailHost(value: string): string | null {
+  const host = value.split("@")[1]?.replace(/\.$/, "").toLowerCase();
+  if (!host || !host.includes(".")) return null;
+  return host;
+}
+
+function emailsFrom(record: Record<string, unknown>): string[] {
+  const found: string[] = [];
+  const collect = (value: unknown) => {
+    if (typeof value === "string") {
+      for (const match of value.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) found.push(match[0].toLowerCase());
+      return;
+    }
+    if (!Array.isArray(value)) return;
+    for (const entry of value) {
+      if (typeof entry === "string") collect(entry);
+      else if (entry && typeof entry === "object" && "value" in entry) collect((entry as { value?: unknown }).value);
+    }
+  };
+  collect(record.emails);
+  collect(record.email);
+  collect(record.primary_email);
+  return [...new Set(found)];
+}
+
 export async function createCrmNote(payload: {
   content: string;
   org_id?: number;
   deal_id?: number;
   person_id?: number;
+  lead_id?: string;
 }): Promise<number> {
   const data = await pipedriveRequest("notes", {
     method: "POST",
@@ -150,6 +218,7 @@ export async function createCrmNote(payload: {
       org_id: payload.org_id,
       deal_id: payload.deal_id,
       person_id: payload.person_id,
+      lead_id: payload.lead_id,
     }),
   });
   const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
@@ -184,11 +253,39 @@ export async function createCrmActivity(payload: {
   return id;
 }
 
+export async function createCrmOrganization(payload: { name: string; city?: string; website?: string }): Promise<number> {
+  const data = await pipedriveRequest("organizations", {
+    method: "POST",
+    body: definedFields({
+      name: payload.name,
+      address: payload.city,
+      website: payload.website,
+    }),
+  });
+  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  if (id === null) throw new Error("Pipedrive did not return an organization id.");
+  return id;
+}
+
+export async function createCrmPerson(payload: { name: string; org_id: number; email?: string }): Promise<number> {
+  const data = await pipedriveRequest("persons", {
+    method: "POST",
+    body: definedFields({
+      name: payload.name,
+      org_id: payload.org_id,
+      email: payload.email ? [{ value: payload.email, primary: true, label: "work" }] : undefined,
+    }),
+  });
+  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  if (id === null) throw new Error("Pipedrive did not return a person id.");
+  return id;
+}
+
 export async function createCrmLead(payload: {
   title: string;
   organization_id?: number;
   person_id?: number;
-}): Promise<number> {
+}): Promise<string> {
   const data = await pipedriveRequest("leads", {
     method: "POST",
     body: definedFields({
@@ -197,9 +294,153 @@ export async function createCrmLead(payload: {
       person_id: payload.person_id,
     }),
   });
-  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  const id = crmId(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
   if (id === null) throw new Error("Pipedrive did not return a lead id.");
   return id;
+}
+
+type DuplicateHit = {
+  kind: CrmMatch["kind"];
+  id: number | string;
+  name: string;
+  organizationId: number | null;
+  organizationName: string | null;
+  emails: string[];
+  website: string | null;
+};
+
+async function searchDuplicateHits(term: string): Promise<DuplicateHit[]> {
+  const query = term.trim();
+  if (query.length < 2) return [];
+  const data = await pipedriveGet("itemSearch", {
+    term: query,
+    item_types: "organization,person,lead",
+    limit: "20",
+  });
+  const items = asList(data && typeof data === "object" ? (data as { items?: unknown }).items : null);
+  return items.flatMap((entry) => {
+    const item = entry.item;
+    if (!item || typeof item !== "object") return [];
+    const record = item as Record<string, unknown>;
+    const kind = record.type === "organization" || record.type === "person" || record.type === "lead" ? record.type : null;
+    if (!kind) return [];
+    const name = text(kind === "lead" ? (record.title ?? record.name) : record.name);
+    const id = kind === "lead" ? crmId(record.id) : numberOrNull(record.id);
+    if (!name || id === null) return [];
+    const organization = record.organization;
+    const orgRecord = organization && typeof organization === "object" ? (organization as Record<string, unknown>) : null;
+    return [
+      {
+        kind,
+        id,
+        name,
+        organizationId: numberOrNull(orgRecord?.id),
+        organizationName: text(orgRecord?.name),
+        emails: emailsFrom(record),
+        website: text(record.website),
+      },
+    ];
+  });
+}
+
+async function personEmails(personId: number): Promise<string[]> {
+  const data = await pipedriveGet(`persons/${personId}`);
+  if (!data || typeof data !== "object") return [];
+  return emailsFrom(data as Record<string, unknown>);
+}
+
+async function organizationWebsite(orgId: number): Promise<string | null> {
+  const data = await pipedriveGet(`organizations/${orgId}`);
+  if (!data || typeof data !== "object") return null;
+  return text((data as { website?: unknown }).website);
+}
+
+function toMatch(hit: DuplicateHit): CrmMatch {
+  return { kind: hit.kind, id: hit.id, name: hit.name };
+}
+
+export async function findCrmDuplicate(input: {
+  company?: string;
+  emails?: string[];
+  website?: string;
+}): Promise<CrmMatch[][]> {
+  const company = input.company?.trim() ?? "";
+  const emails = [...new Set((input.emails ?? []).map((email) => email.trim().toLowerCase()).filter(Boolean))];
+  const domain = websiteHost(input.website);
+  const terms = [company, ...emails, domain ?? ""].filter((term, index, all) => term.length >= 2 && all.indexOf(term) === index);
+  const hits: DuplicateHit[] = [];
+  const seenHits = new Set<string>();
+  for (const term of terms) {
+    for (const hit of await searchDuplicateHits(term)) {
+      const key = `${hit.kind}:${hit.id}`;
+      if (seenHits.has(key)) continue;
+      seenHits.add(key);
+      hits.push(hit);
+    }
+  }
+
+  for (const hit of hits) {
+    if (hit.kind !== "person" || typeof hit.id !== "number" || hit.emails.length > 0) continue;
+    if (emails.length === 0 && !domain) continue;
+    hit.emails = await personEmails(hit.id);
+  }
+
+  const matched: DuplicateHit[] = [];
+  const seen = new Set<string>();
+  const add = (hit: DuplicateHit) => {
+    const key = `${hit.kind}:${hit.id}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    matched.push(hit);
+  };
+
+  for (const hit of hits) {
+    if (hit.kind === "organization" && company && sameCompanyName(hit.name, company)) add(hit);
+    if (hit.kind === "lead" && company && sameCompanyName(hit.name, company)) add(hit);
+    if (hit.kind !== "person") continue;
+    const emailHit = hit.emails.some((email) => emails.includes(email));
+    const domainHit = !!domain && hit.emails.some((email) => emailHost(email) === domain);
+    const nameHit = !!company && sameCompanyName(hit.name, company);
+    if (emailHit || domainHit || nameHit) add(hit);
+  }
+
+  if (domain) {
+    for (const hit of hits) {
+      if (hit.kind !== "organization" || typeof hit.id !== "number" || seen.has(`organization:${hit.id}`)) continue;
+      const website = hit.website ?? (await organizationWebsite(hit.id));
+      if (websiteHost(website ?? undefined) === domain) add(hit);
+    }
+  }
+
+  for (const hit of hits) {
+    if (hit.kind !== "person" || !hit.organizationId || !hit.organizationName || !company) continue;
+    if (!sameCompanyName(hit.organizationName, company)) continue;
+    add({
+      kind: "organization",
+      id: hit.organizationId,
+      name: hit.organizationName,
+      organizationId: hit.organizationId,
+      organizationName: hit.organizationName,
+      emails: [],
+      website: null,
+    });
+  }
+
+  const groups: CrmMatch[][] = [];
+  const consumed = new Set<string>();
+  for (const organization of matched.filter((hit) => hit.kind === "organization")) {
+    const people = matched.filter((hit) => hit.kind === "person" && hit.organizationId === organization.id);
+    consumed.add(`organization:${organization.id}`);
+    for (const person of people) consumed.add(`person:${person.id}`);
+    groups.push([toMatch(organization), ...people.map(toMatch)]);
+  }
+  for (const hit of matched) {
+    const key = `${hit.kind}:${hit.id}`;
+    if (consumed.has(key)) continue;
+    consumed.add(key);
+    groups.push([toMatch(hit)]);
+  }
+  return groups;
 }
 
 export async function crmSearch(query: string): Promise<CrmSearchHit[]> {

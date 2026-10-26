@@ -1,0 +1,3 @@
+Do step 3 only. Implement the Orchestrator with kit/prompts/orchestrator.md and tool calling.
+For now implement only the ask_specialist tool (it calls the specialist function from step 2).
+Show a small "Consulted: ..." line above its reply.

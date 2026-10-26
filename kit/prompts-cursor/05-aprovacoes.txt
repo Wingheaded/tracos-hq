@@ -1,0 +1,4 @@
+Do step 5 only. Build /admin with the Approvals tab. Add the propose_crm_write tool to the Orchestrator:
+it inserts a pending approval and never writes to Pipedrive directly. When a human clicks Approve,
+the server creates the note or activity in Pipedrive and marks the approval as approved.
+Show approval cards in the chat too, with Approve / Reject buttons.

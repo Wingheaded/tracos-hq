@@ -1,0 +1,197 @@
+{
+  "agent": {
+    "name": "Tomás",
+    "segment": "Acoustics",
+    "human_owner": "Joana"
+  },
+  "scope": [
+    "echo and reverberation (absorption)",
+    "sound blocking between rooms (insulation)",
+    "decorative acoustic panels",
+    "meeting rooms, open spaces, restaurants, schools, gyms"
+  ],
+  "brands": [
+    {
+      "name": "ECOcero",
+      "origin": "Spain",
+      "positioning": "Mid-to-high / technical and sustainable (recycled PET)",
+      "best_for": [
+        "echo and reverberation",
+        "speech intelligibility",
+        "offices",
+        "classrooms",
+        "gyms",
+        "auditoriums"
+      ],
+      "key_collections": [],
+      "indicative_price_range": "€100 – €500 per panel",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Most versatile for acoustic comfort. Offers acoustic studies. Not the main choice for blocking sound.",
+      "source_catalogue": "ECOCERO_Catalogo_2025.pdf",
+      "products": [
+        {
+          "collection": "ECOceiling",
+          "type": "ceiling panels",
+          "description": "Recycled PET ceiling solutions, including Baffle, Cloud and Volume formats."
+        },
+        {
+          "collection": "ECOwall",
+          "type": "wall panels",
+          "description": "Recycled PET wall panels in many shapes and colours."
+        },
+        {
+          "collection": "ECOnordik",
+          "type": "wall / ceiling panels",
+          "description": "Panels with a wood look."
+        },
+        {
+          "collection": "Groovy",
+          "type": "wall panel",
+          "designer": "Alejandra Pombo",
+          "description": "Inspired by 1970s postmodernism."
+        },
+        {
+          "collection": "Strata / Meet",
+          "type": "wall panels",
+          "designer": "Erico Navazo",
+          "description": "Designer collections."
+        },
+        {
+          "collection": "V-cut / Emotion / Quadrilateral / Curve / Square",
+          "type": "decorative acoustic panels"
+        },
+        {
+          "collection": "ECOimagine / Print",
+          "type": "printed panels",
+          "description": "Custom prints and images on acoustic panels."
+        }
+      ]
+    },
+    {
+      "name": "Greenarea (acoustic)",
+      "origin": "Spain",
+      "positioning": "High-end / biophilic acoustic comfort",
+      "best_for": [
+        "echo reduction with preserved plants",
+        "meeting rooms",
+        "lobbies",
+        "restaurants"
+      ],
+      "key_collections": [
+        "OTOgreen"
+      ],
+      "indicative_price_range": "€400 – €1,200+ per m²",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Acoustic comfort plus a green aesthetic. Not a structural sound barrier.",
+      "source_catalogue": "GREENAREA_Catalogo-OTO-Green.pdf + GREENAREA_Catalogo_ILLA_2023.11.pdf",
+      "products": [
+        {
+          "collection": "OTOgreen Wall",
+          "type": "acoustic panel with preserved plants",
+          "designer": "Rafa Ortega",
+          "description": "Several sizes, can be combined."
+        },
+        {
+          "collection": "OTOgreen Planter",
+          "type": "acoustic planter",
+          "designer": "Rafa Ortega",
+          "description": "Floor, table and hanging formats."
+        },
+        {
+          "collection": "ILLA Wall / ILLA Ceiling / ILLA Planter",
+          "type": "geometric acoustic modules",
+          "designer": "Rafa Ortega",
+          "description": "Recycled PET (1.2 cm) with preserved lichen, moss or hydrangea. PENTA Wall can include LED. Sizes: TRI 52x35x14, QUAD 55x52x15, PENTA 70x50x15 cm."
+        }
+      ]
+    },
+    {
+      "name": "Archipanels",
+      "origin": "Spain",
+      "positioning": "High-end / architectural wall skin",
+      "best_for": [
+        "blocking sound between rooms",
+        "partition walls",
+        "decorative 3D relief walls and ceilings"
+      ],
+      "key_collections": [],
+      "indicative_price_range": "€150 – €600 per m²",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Choose when sound passes from one room to another and the wall must look architectural.",
+      "source_catalogue": "ARCHIPANELS_Catalogo_2025.pdf",
+      "products": [
+        {
+          "collection": "Aqua and other 3D relief panels",
+          "type": "architectural wall panels",
+          "designer": "Arik Levy (Aqua)",
+          "description": "Supplied in raw colour and painted on site with roller or spray to match the space."
+        }
+      ]
+    },
+    {
+      "name": "Feltouch",
+      "origin": "",
+      "positioning": "PET-felt acoustic panels, ceiling systems and acoustic lighting",
+      "best_for": [
+        "offices and open spaces",
+        "commercial and public spaces",
+        "3D walls and ceilings",
+        "acoustic lighting"
+      ],
+      "key_collections": [
+        "Reborn",
+        "FlatLine",
+        "Sense",
+        "Parallax",
+        "Vertigo",
+        "Flux",
+        "Sparkle",
+        "Bowl",
+        "Ripple",
+        "NewGlow",
+        "Nube",
+        "Lay-In Volta"
+      ],
+      "indicative_price_range": null,
+      "price_status": "on request",
+      "advisory_note": "Catalogue states NRC 0.80 for some models (e.g. Reborn). Confirm per model.",
+      "source_catalogue": "FeltouchCollection.pdf",
+      "products": [
+        {
+          "collection": "Reborn (Inception, Reflection, Metamorphosis)",
+          "type": "wall panels",
+          "designer": "Melika Özer",
+          "description": "Three models. Catalogue shows NRC 0.80."
+        },
+        {
+          "collection": "FlatLine",
+          "type": "wall panels",
+          "designer": "Defne Koz & Marco Susani",
+          "description": "Movable panels for balanced acoustic workspaces."
+        },
+        {
+          "collection": "Sense / Parallax / Vertigo / Flux",
+          "type": "large thermo-pressed panels",
+          "description": "Modular 3D patterns for walls, ceilings and corners."
+        },
+        {
+          "collection": "Sparkle / Bowl / Ripple / Line",
+          "type": "acoustic lighting",
+          "description": "Dimmable, glare-free direct and indirect light combined with acoustic felt."
+        },
+        {
+          "collection": "NewGlow (Conic, Nube)",
+          "type": "acoustic pendants"
+        },
+        {
+          "collection": "Lay-In / Volta",
+          "type": "ceiling tiles",
+          "description": "Lay-in acoustic ceiling panels, can integrate lighting."
+        }
+      ]
+    }
+  ],
+  "comparison": "ECOcero = absorption and echo. Feltouch = PET felt panels and acoustic lighting. Greenarea = acoustic comfort with nature. Archipanels = blocking sound between spaces.",
+  "first_question": "Is the problem echo inside the room, or sound passing between rooms?",
+  "price_policy": "Never invent prices. Ranges marked 'indicative' come from brand research and are NOT a quote. For a firm price, hand over to the human owner of the segment."
+}

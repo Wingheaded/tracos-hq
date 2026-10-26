@@ -1,0 +1,226 @@
+[
+  {
+    "file": "vibia-wireflow.jpg",
+    "brand": "vibia",
+    "collection": "Wireflow",
+    "source": "VIBIA_Catalogo_V1_e_V2_2024.pdf",
+    "page": 82
+  },
+  {
+    "file": "vibia-algorithm.jpg",
+    "brand": "vibia",
+    "collection": "Algorithm",
+    "source": "VIBIA_Catalogo_V1_e_V2_2024.pdf",
+    "page": 115
+  },
+  {
+    "file": "vibia-north.jpg",
+    "brand": "vibia",
+    "collection": "North",
+    "source": "VIBIA_Catalogo_V1_e_V2_2024.pdf",
+    "page": 447
+  },
+  {
+    "file": "vibia-palma.jpg",
+    "brand": "vibia",
+    "collection": "Palma",
+    "source": "VIBIA_Catalogo_V1_e_V2_2024.pdf",
+    "page": 409
+  },
+  {
+    "file": "lzf-agatha.jpg",
+    "brand": "lzf",
+    "collection": "Agatha",
+    "source": "LZF_Catalogo.pdf",
+    "page": 39
+  },
+  {
+    "file": "lzf-swirl.jpg",
+    "brand": "lzf",
+    "collection": "Swirl",
+    "source": "LZF_Catalogo.pdf",
+    "page": 235
+  },
+  {
+    "file": "lzf-link.jpg",
+    "brand": "lzf",
+    "collection": "Link",
+    "source": "LZF_Catalogo.pdf",
+    "page": 15
+  },
+  {
+    "file": "ole-celeste.jpg",
+    "brand": "ole",
+    "collection": "Celeste",
+    "source": "OLE_Catalogo_2025-2026.pdf",
+    "page": 45
+  },
+  {
+    "file": "ole-conga.jpg",
+    "brand": "ole",
+    "collection": "Conga",
+    "source": "OLE_Catalogo_2025-2026.pdf",
+    "page": 123
+  },
+  {
+    "file": "roger-la-hutte.jpg",
+    "brand": "roger",
+    "collection": "La Hutte",
+    "source": "ROGER_PRADIER_Catalogo.pdf",
+    "page": 20
+  },
+  {
+    "file": "roger-place-des-vosges.jpg",
+    "brand": "roger",
+    "collection": "Place des Vosges",
+    "source": "ROGER_PRADIER_Catalogo.pdf",
+    "page": 119
+  },
+  {
+    "file": "ecocero-groovy.jpg",
+    "brand": "ecocero",
+    "collection": "Groovy",
+    "source": "ECOCERO_Catalogo_2025.pdf",
+    "page": 13
+  },
+  {
+    "file": "ecocero-baffle.jpg",
+    "brand": "ecocero",
+    "collection": "Baffle",
+    "source": "ECOCERO_Catalogo_2025.pdf",
+    "page": 44
+  },
+  {
+    "file": "feltouchcollection-sense.jpg",
+    "brand": "feltouchcollection",
+    "collection": "Sense",
+    "source": "FeltouchCollection.pdf",
+    "page": 13
+  },
+  {
+    "file": "feltouchcollection-sparkle.jpg",
+    "brand": "feltouchcollection",
+    "collection": "Sparkle",
+    "source": "FeltouchCollection.pdf",
+    "page": 21
+  },
+  {
+    "file": "greenarea-otogreen-wall.jpg",
+    "brand": "greenarea",
+    "collection": "OTOgreen Wall",
+    "source": "GREENAREA_Catalogo-OTO-Green.pdf",
+    "page": 6
+  },
+  {
+    "file": "greenarea-illa-wall.jpg",
+    "brand": "greenarea",
+    "collection": "ILLA Wall",
+    "source": "GREENAREA_Catalogo_ILLA_2023.11.pdf",
+    "page": 4
+  },
+  {
+    "file": "archipanels-aqua.jpg",
+    "brand": "archipanels",
+    "collection": "AQUA",
+    "source": "ARCHIPANELS_Catalogo_2025.pdf",
+    "page": 8
+  },
+  {
+    "file": "chameleon-curve-wall.jpg",
+    "brand": "chameleon",
+    "collection": "Curve Wall",
+    "source": "Chameleon_price_list_catalogue_2026_EN.pdf",
+    "page": 36
+  },
+  {
+    "file": "chameleon-harmonica.jpg",
+    "brand": "chameleon",
+    "collection": "Harmonica",
+    "source": "Chameleon_price_list_catalogue_2026_EN.pdf",
+    "page": 39
+  },
+  {
+    "file": "kettal-pavilion-m.jpg",
+    "brand": "kettal",
+    "collection": "Pavilion M",
+    "source": "KETTAL_Catalogo_Workplace.pdf",
+    "page": 25
+  },
+  {
+    "file": "kettal-kall.jpg",
+    "brand": "kettal",
+    "collection": "Kall",
+    "source": "KETTAL_Catalogo_Workplace.pdf",
+    "page": 13
+  },
+  {
+    "file": "kriskadecor-space-dividers.jpg",
+    "brand": "kriskadecor",
+    "collection": "SPACE DIVIDERS",
+    "source": "KRISKADECOR_Catalogo_Geral.pdf",
+    "page": 41
+  },
+  {
+    "file": "ofitres-avant.jpg",
+    "brand": "ofitres",
+    "collection": "Avant",
+    "source": "OFITRES_catalogo_Issue-01_2022.pdf",
+    "page": 23
+  },
+  {
+    "file": "ofitres-oxygen.jpg",
+    "brand": "ofitres",
+    "collection": "Oxygen",
+    "source": "OFITRES_catalogo_Issue-01_2022.pdf",
+    "page": 18
+  },
+  {
+    "file": "kettal-tilos.jpg",
+    "brand": "kettal",
+    "collection": "Tilos",
+    "source": "KETTAL_Catalogo_Living.pdf",
+    "page": 6
+  },
+  {
+    "file": "kettal-bitta.jpg",
+    "brand": "kettal",
+    "collection": "Bitta",
+    "source": "KETTAL_Catalogo_Living.pdf",
+    "page": 74
+  },
+  {
+    "file": "kettal-pavilion-h.jpg",
+    "brand": "kettal",
+    "collection": "Pavilion H",
+    "source": "KETTAL_Catalogo_Living.pdf",
+    "page": 145
+  },
+  {
+    "file": "isimar-bolonia.jpg",
+    "brand": "isimar",
+    "collection": "Bolonia",
+    "source": "ISIMAR_Catalogo_2026.pdf",
+    "page": 43
+  },
+  {
+    "file": "vondom-ulm.jpg",
+    "brand": "vondom",
+    "collection": "ULM",
+    "source": "VONDOM_DESIGNERS.pdf",
+    "page": 7
+  },
+  {
+    "file": "vondom-africa.jpg",
+    "brand": "vondom",
+    "collection": "AFRICA",
+    "source": "VONDOM_DESIGNERS.pdf",
+    "page": 114
+  },
+  {
+    "file": "establees-square.jpg",
+    "brand": "establees",
+    "collection": "SQUARE",
+    "source": "ESTABLEES_Catalogo_2026.pdf",
+    "page": 23
+  }
+]

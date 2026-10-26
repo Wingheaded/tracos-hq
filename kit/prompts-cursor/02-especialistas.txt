@@ -1,0 +1,4 @@
+Do step 2 only. Implement the five specialists using kit/prompts/specialist.md as the template
+and the matching file in kit/catalog/ as {{catalog_json}}. Use the xAI API (OpenAI-compatible SDK,
+baseURL https://api.x.ai/v1, model and key from .env.local). Stream the replies.
+Each specialist answers when mentioned: @Daniel, @Tomás, @Maya, @André, @Inês.

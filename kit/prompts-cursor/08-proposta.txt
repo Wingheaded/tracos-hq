@@ -1,0 +1,3 @@
+Do step 8 only. Add an "Export proposal" button under Orchestrator answers that renders a clean
+HTML proposal (client, areas, products, indicative prices, human owners) with photos from kit/images/
+matched via kit/images/index.json by brand and collection. Printable to PDF from the browser.

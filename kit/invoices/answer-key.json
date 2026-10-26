@@ -1,0 +1,132 @@
+[
+  {
+    "file": "01-fuel",
+    "supplier_name": "Combustíveis da Ribeira, Lda.",
+    "supplier_nif": "100000001",
+    "invoice_number": "FS A/2026/10432",
+    "issue_date": "2026-10-02",
+    "net_amount": 74.8,
+    "vat_amount": 17.2,
+    "total_amount": 92.0,
+    "vat_rates": [
+      23
+    ],
+    "category": "fuel",
+    "payment_method": "card",
+    "expected_warning": null
+  },
+  {
+    "file": "02-lunch-client",
+    "supplier_name": "Tasca do Mar Azul",
+    "supplier_nif": "100000002",
+    "invoice_number": "FR 2026/8811",
+    "issue_date": "2026-10-03",
+    "net_amount": 63.82,
+    "vat_amount": 10.17,
+    "total_amount": 73.99,
+    "vat_rates": [
+      13,
+      23
+    ],
+    "category": "meals",
+    "payment_method": "card",
+    "expected_warning": "several VAT rates"
+  },
+  {
+    "file": "03-hotel",
+    "supplier_name": "Hotel Muralha Braga (fictício)",
+    "supplier_nif": "100000003",
+    "invoice_number": "FT 2026/2210",
+    "issue_date": "2026-10-08",
+    "net_amount": 189.28,
+    "vat_amount": 12.72,
+    "total_amount": 202.0,
+    "vat_rates": [
+      6,
+      13
+    ],
+    "category": "travel",
+    "payment_method": "transfer",
+    "expected_warning": "several VAT rates"
+  },
+  {
+    "file": "04-courier",
+    "supplier_name": "Expresso Norte Transportes, S.A.",
+    "supplier_nif": "100000004",
+    "invoice_number": "FT EN/2026/55120",
+    "issue_date": "2026-10-09",
+    "net_amount": 50.7,
+    "vat_amount": 11.66,
+    "total_amount": 62.36,
+    "vat_rates": [
+      23
+    ],
+    "category": "transport_and_shipping",
+    "payment_method": "transfer",
+    "expected_warning": null
+  },
+  {
+    "file": "05-office",
+    "supplier_name": "Papelaria Central do Chiado",
+    "supplier_nif": "100000005",
+    "invoice_number": "FS 2026/3391",
+    "issue_date": "2026-10-12",
+    "net_amount": 101.15,
+    "vat_amount": 23.26,
+    "total_amount": 124.41,
+    "vat_rates": [
+      23
+    ],
+    "category": "office_supplies",
+    "payment_method": "cash",
+    "expected_warning": null
+  },
+  {
+    "file": "06-software",
+    "supplier_name": "CloudDesk Software Unipessoal",
+    "supplier_nif": "100000006",
+    "invoice_number": "FT CD/2026/0987",
+    "issue_date": "2026-10-01",
+    "net_amount": 73.17,
+    "vat_amount": 16.83,
+    "total_amount": 90.0,
+    "vat_rates": [
+      23
+    ],
+    "category": "software",
+    "payment_method": "card",
+    "expected_warning": null
+  },
+  {
+    "file": "07-catalogue-print",
+    "supplier_name": "Gráfica Atlântida, Lda.",
+    "supplier_nif": "100000007",
+    "invoice_number": "FT 2026/1450",
+    "issue_date": "2026-10-15",
+    "net_amount": 705.0,
+    "vat_amount": 162.15,
+    "total_amount": 867.15,
+    "vat_rates": [
+      23
+    ],
+    "category": "marketing",
+    "payment_method": "transfer",
+    "expected_warning": null
+  },
+  {
+    "file": "08-wrong-total",
+    "supplier_name": "Restaurante O Pátio",
+    "supplier_nif": "100000008",
+    "invoice_number": "FR 2026/702",
+    "issue_date": "2026-10-16",
+    "net_amount": 110.6,
+    "vat_amount": 14.38,
+    "total_amount": 129.9,
+    "vat_rates": [
+      13
+    ],
+    "category": "meals",
+    "payment_method": "card",
+    "expected_warning": "amounts do not add up"
+  }
+]

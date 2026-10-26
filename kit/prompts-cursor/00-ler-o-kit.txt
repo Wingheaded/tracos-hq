@@ -1,0 +1,4 @@
+Read kit/BRIEF.md and kit/README.md, then skim kit/prompts/ and one file in kit/catalog/.
+Do NOT write any code yet.
+Reply with: (1) a 5-line summary of the app, (2) the folder structure you plan for the Next.js project,
+(3) any question you need answered before step 1.

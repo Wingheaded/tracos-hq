@@ -1,0 +1,339 @@
+{
+  "agent": {
+    "name": "Daniel",
+    "segment": "Lighting",
+    "human_owner": "João"
+  },
+  "scope": [
+    "architectural lighting",
+    "decorative and sculptural pieces",
+    "outdoor and facade lighting",
+    "hospitality, offices, residential, public spaces"
+  ],
+  "brands": [
+    {
+      "name": "Vibia",
+      "origin": "Spain",
+      "positioning": "Luxury / architectural lighting systems",
+      "best_for": [
+        "architectural integration",
+        "minimalist modular systems",
+        "scene control",
+        "flagship offices",
+        "hotels",
+        "galleries"
+      ],
+      "key_collections": [
+        "Plusminus",
+        "Flamingo",
+        "Wireflow",
+        "Algorithm"
+      ],
+      "indicative_price_range": "€800 – €10,000+ (systems)",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "The architect's choice: light as part of the structure.",
+      "source_catalogue": "VIBIA_Catalogo_V1_e_V2_2024.pdf",
+      "products": [
+        {
+          "collection": "Plusminus",
+          "type": "lighting system",
+          "description": "Textile/cable system to 'draw' light across a space, for large volumes and high ceilings."
+        },
+        {
+          "collection": "Wireflow",
+          "type": "pendant",
+          "description": "Airy 3D outline made of black electrical cables with LED terminals. Works over tables and in double-height spaces."
+        },
+        {
+          "collection": "Algorithm",
+          "type": "pendant",
+          "description": "Cloud of globes that defines zones inside large interiors."
+        },
+        {
+          "collection": "Flamingo",
+          "type": "pendant",
+          "description": "Layered translucent diffusers, slender silhouettes for high ceilings."
+        },
+        {
+          "collection": "Mayfair",
+          "type": "table / floor / pendant",
+          "description": "Modern take on the 19th-century bouillotte lamp, diffuse downward light."
+        },
+        {
+          "collection": "North",
+          "type": "pendant",
+          "description": "Adjustable triangular carbon-fibre rods holding the shades."
+        },
+        {
+          "collection": "Circus",
+          "type": "lighting system",
+          "description": "Minimal conductive bar with balanced elements. A toolkit of diffuse and accent light."
+        },
+        {
+          "collection": "Knit",
+          "type": "pendant / wall",
+          "description": "Textured, tactile diffuser that gives a warm, soft light."
+        },
+        {
+          "collection": "Palma",
+          "type": "pendant",
+          "description": "Lighting composition that can integrate plants. Good for biophilic projects."
+        },
+        {
+          "collection": "Tempo",
+          "type": "pendant / wall",
+          "description": "Blown-glass archetypes (disc, diamond, milk-glass oval) in two sizes."
+        },
+        {
+          "collection": "Musa",
+          "type": "pendant / floor",
+          "description": "Delicate silhouette inspired by nature."
+        },
+        {
+          "collection": "Guise",
+          "type": "wall / floor",
+          "description": "Glass panel lit by a row of recessed LEDs, light appears to float in the glass."
+        },
+        {
+          "collection": "Africa",
+          "type": "table",
+          "description": "Small decorative object lamp."
+        },
+        {
+          "collection": "Sticks",
+          "type": "lighting system",
+          "description": "Toolkit for integrating light into architecture."
+        },
+        {
+          "collection": "Dots",
+          "type": "recessed",
+          "description": "Discreet ceiling accents, trim or trimless, also in wood finishes."
+        }
+      ]
+    },
+    {
+      "name": "a·emotional light",
+      "origin": "Spain",
+      "positioning": "High-end / artistic, handcrafted",
+      "best_for": [
+        "sculptural statement pieces",
+        "boutique hotels",
+        "restaurants",
+        "premium residential"
+      ],
+      "key_collections": [
+        "Coral",
+        "Parga",
+        "Umbra"
+      ],
+      "indicative_price_range": "€300 – €2,500+",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "When the luminaire should be the protagonist and give the space a soul. Note: no a·emotional catalogue in the voice agent's knowledge base, so product details are limited.",
+      "source_catalogue": null
+    },
+    {
+      "name": "LZF Lamps",
+      "origin": "Spain",
+      "positioning": "High-end / natural wood veneer (Timberlite)",
+      "best_for": [
+        "warmth",
+        "biophilic design",
+        "diffused light",
+        "lounges",
+        "libraries",
+        "waiting areas"
+      ],
+      "key_collections": [
+        "Link",
+        "Swirl",
+        "Air"
+      ],
+      "indicative_price_range": "€400 – €3,000+",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Warm, natural, FSC wood. Pairs well with biophilia projects.",
+      "source_catalogue": "LZF_Catalogo.pdf",
+      "products": [
+        {
+          "collection": "Agatha",
+          "type": "pendant",
+          "designer": "Luis Eslava Studio",
+          "description": "Concentric wood-veneer petals forming a flower of light."
+        },
+        {
+          "collection": "Swirl",
+          "type": "pendant",
+          "designer": "Ray Power",
+          "description": "Twisting sculptural form made from a flat sheet of wood veneer."
+        },
+        {
+          "collection": "Link / Link Chain",
+          "type": "pendant",
+          "description": "Modular wood-veneer pendant. Link Chain builds vertical or horizontal configurations to measure."
+        },
+        {
+          "collection": "Osca",
+          "type": "pendant",
+          "designer": "Bodo Sperlein",
+          "description": "Rhythmic metal and wood-veneer arches, extendable composition. Homage to Oscar Niemeyer."
+        },
+        {
+          "collection": "Candelabro",
+          "type": "chandelier installation",
+          "designer": "Mariví Calvo",
+          "description": "Hanging garden of lamps and golden birds combining several LZF icons."
+        },
+        {
+          "collection": "Black Note",
+          "type": "pendant",
+          "description": "Linear lamp inspired by piano keys, two independently controlled circuits."
+        },
+        {
+          "collection": "Omma",
+          "type": "pendant",
+          "designer": "Eli Gutiérrez",
+          "description": "Wood-veneer suspension."
+        },
+        {
+          "collection": "Guijarro",
+          "type": "table / floor",
+          "description": "Pebble-shaped lamps in small, medium and large."
+        },
+        {
+          "collection": "Mini Chou",
+          "type": "cordless table lamp",
+          "description": "Portable rechargeable lamp."
+        },
+        {
+          "collection": "Habitat",
+          "type": "ceramic lamp",
+          "description": "Raw-ceramic lamp echoing modular apartment blocks."
+        }
+      ]
+    },
+    {
+      "name": "Olé Lighting",
+      "origin": "Spain",
+      "positioning": "Mid-to-high / project-oriented, customisable",
+      "best_for": [
+        "custom sizes, colours, finishes",
+        "controlled budgets",
+        "offices",
+        "hotels",
+        "restaurants"
+      ],
+      "key_collections": [
+        "Allegra",
+        "Celeste",
+        "Candela"
+      ],
+      "indicative_price_range": "€200 – €1,500",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "The problem solver when a project needs a custom fit without luxury pricing.",
+      "source_catalogue": "OLE_Catalogo_2025-2026.pdf",
+      "products": [
+        {
+          "collection": "Celeste",
+          "type": "pendant (acoustic)",
+          "designer": "Rafa Ortega",
+          "description": "Linear luminaire combined with acoustic material. Light and sound comfort in one piece."
+        },
+        {
+          "collection": "Allegra",
+          "type": "pendant / table",
+          "description": "Truncated-cone shade with organic texture and warm diffused glow."
+        },
+        {
+          "collection": "Conga",
+          "type": "pendant",
+          "description": "Handcrafted braided double cone in sustainable cord, many colours."
+        },
+        {
+          "collection": "Medusa",
+          "type": "pendant",
+          "description": "Jellyfish-inspired shape in two versions."
+        },
+        {
+          "collection": "Nexo",
+          "type": "wall / table",
+          "description": "Customisable with metal or cord shades."
+        },
+        {
+          "collection": "Ti-zas",
+          "type": "modular wall / ceiling",
+          "description": "Minimal aluminium and polycarbonate 'chalk strokes' with LED, many combinations."
+        },
+        {
+          "collection": "Halo",
+          "type": "recessed downlight",
+          "description": "Creates a luminous ring on the ceiling. Corridors, kitchens, bathrooms."
+        },
+        {
+          "collection": "Candela",
+          "type": "lantern",
+          "description": "Traditional lantern shape with modern LED, textured metal frame."
+        },
+        {
+          "collection": "Avatar",
+          "type": "pendant family",
+          "description": "Several versions (Pop, Twist, Plus)."
+        },
+        {
+          "collection": "Banyo / Pot / Drum / Pagoda / Polaris / Morgana / Pepo",
+          "type": "pendant families",
+          "description": "Cord and metal collections in many sizes and colours."
+        }
+      ]
+    },
+    {
+      "name": "Roger Pradier",
+      "origin": "France",
+      "positioning": "Premium outdoor lighting",
+      "best_for": [
+        "facades",
+        "gardens",
+        "terraces",
+        "coastal sites",
+        "low maintenance"
+      ],
+      "key_collections": [
+        "Hugy",
+        "Carex",
+        "Ronex"
+      ],
+      "indicative_price_range": "€150 – €1,200",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "The safe bet outdoors. Confirm IP rating and warranty before quoting.",
+      "source_catalogue": "ROGER_PRADIER_Catalogo.pdf",
+      "products": [
+        {
+          "collection": "La Hutte",
+          "type": "outdoor lamp",
+          "description": "Inspired by a primitive hut: a glass casing around the light source."
+        },
+        {
+          "collection": "Place des Vosges",
+          "type": "outdoor wall / post (Tradition)",
+          "description": "Classic lantern style for heritage façades."
+        },
+        {
+          "collection": "Lampiok",
+          "type": "outdoor wall / bollard"
+        },
+        {
+          "collection": "Avenue",
+          "type": "outdoor post / bollard"
+        },
+        {
+          "collection": "Citadelle / Chenonceau / Kent",
+          "type": "outdoor wall lanterns"
+        },
+        {
+          "collection": "Carex / Ronex / Hugy / Bark / Plémo",
+          "type": "contemporary outdoor luminaires"
+        }
+      ]
+    }
+  ],
+  "comparison": "Vibia = architectural and integrated. a·emotional = sculptural. LZF = warm wood. Olé = flexible and custom. Roger Pradier = outdoor durability.",
+  "price_policy": "Never invent prices. Ranges marked 'indicative' come from brand research and are NOT a quote. For a firm price, hand over to the human owner of the segment."
+}

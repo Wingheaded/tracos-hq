@@ -1,0 +1,62 @@
+{
+  "agent": {
+    "name": "Inês",
+    "segment": "Biophilia",
+    "human_owner": "Nelson"
+  },
+  "scope": [
+    "preserved vegetation",
+    "vertical gardens and green walls",
+    "green ceilings",
+    "lichen and moss",
+    "planters",
+    "logos and branding in lichen",
+    "wood & stones",
+    "lobbies, offices, hotels, retail"
+  ],
+  "brands": [
+    {
+      "name": "Greenarea",
+      "origin": "Spain",
+      "positioning": "High-end / preserved vegetation and biophilic design",
+      "best_for": [
+        "nature indoors without intensive maintenance",
+        "green walls",
+        "brand logos in lichen or moss",
+        "receptions",
+        "showrooms",
+        "restaurants",
+        "offices"
+      ],
+      "key_collections": [
+        "OTOgreen (acoustic)",
+        "ILLA"
+      ],
+      "indicative_price_range": "€400 – €1,200+ per m²",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Do not promise 'no water, no light, no maintenance' unless confirmed for the specific product.",
+      "source_catalogue": "GREENAREA_Catalogo-OTO-Green.pdf + GREENAREA_Catalogo_ILLA_2023.11.pdf",
+      "products": [
+        {
+          "collection": "OTOgreen Wall",
+          "type": "acoustic + biophilic wall panel",
+          "designer": "Rafa Ortega",
+          "description": "Preserved plants on acoustic panels."
+        },
+        {
+          "collection": "OTOgreen Planter",
+          "type": "acoustic planter",
+          "designer": "Rafa Ortega",
+          "description": "Floor, table and hanging formats."
+        },
+        {
+          "collection": "ILLA Wall / ILLA Ceiling / ILLA Planter",
+          "type": "geometric modules",
+          "description": "Recycled PET with preserved lichen, moss or hydrangea. The catalogue states 100% natural vegetation and no maintenance."
+        }
+      ]
+    }
+  ],
+  "comparison": "Single brand. For an acoustic need, work with Tomás (Greenarea OTOgreen).",
+  "price_policy": "Never invent prices. Ranges marked 'indicative' come from brand research and are NOT a quote. For a firm price, hand over to the human owner of the segment."
+}

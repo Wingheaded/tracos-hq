@@ -1,0 +1,252 @@
+{
+  "agent": {
+    "name": "André",
+    "segment": "Corporate / workplace",
+    "human_owner": "Célia"
+  },
+  "scope": [
+    "offices and open spaces",
+    "meeting rooms and focus booths",
+    "storage and organisation",
+    "reception areas",
+    "home office",
+    "zoning without construction"
+  ],
+  "brands": [
+    {
+      "name": "Kettal Workplace",
+      "origin": "Spain",
+      "positioning": "Luxury / high-end corporate systems",
+      "best_for": [
+        "flagship offices",
+        "rooms within rooms",
+        "focus booths",
+        "meeting hubs",
+        "reconfigurable layouts"
+      ],
+      "key_collections": [
+        "Pavilion O"
+      ],
+      "indicative_price_range": "€10,000 – €50,000+ per modular setup",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Modular architecture instead of permanent walls.",
+      "source_catalogue": "KETTAL_Catalogo_Workplace.pdf",
+      "products": [
+        {
+          "collection": "Pavilion M",
+          "type": "modular office architecture",
+          "description": "Aluminium structure to create hubs, meeting rooms, focus and support areas inside an open space. Louvers, curtains or glass. 'Click & Work' modularity."
+        },
+        {
+          "collection": "Kall / Kall S",
+          "type": "phone booth",
+          "description": "Booth designed around a glass door, appears embedded in the wall. Wheels and levelling feet, plug and USB."
+        },
+        {
+          "collection": "Workplace Focus",
+          "type": "focus spaces",
+          "description": "Spaces for isolated, concentrated work."
+        },
+        {
+          "collection": "Workplace Meeting rooms",
+          "type": "meeting rooms",
+          "description": "Formal and informal collaboration."
+        },
+        {
+          "collection": "Workplace Support",
+          "type": "reception, kitchen, lockers",
+          "description": "Structures for reception, printing, kitchen and lockers."
+        },
+        {
+          "collection": "Insula",
+          "type": "modular sofa",
+          "designer": "Patricia Urquiola",
+          "description": "Low modular sofa inspired by the Arab majlis."
+        },
+        {
+          "collection": "Passage",
+          "type": "chair",
+          "description": "Versatile chair for indoor or outdoor use."
+        }
+      ]
+    },
+    {
+      "name": "Ofitres",
+      "origin": "Spain",
+      "positioning": "Mid-to-high / functional design furniture",
+      "best_for": [
+        "workstations",
+        "storage",
+        "reception desks",
+        "home office",
+        "plants integrated in furniture"
+      ],
+      "key_collections": [
+        "Avant",
+        "I.POP",
+        "O.POP",
+        "Oxygen",
+        "Tono",
+        "Tendencies",
+        "Ergomedic 150"
+      ],
+      "indicative_price_range": "€150 – €1,500 per desk or storage unit",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "The all-rounder for functional, human offices.",
+      "source_catalogue": "OFITRES_catalogo_Issue-01_2022.pdf",
+      "products": [
+        {
+          "collection": "Avant",
+          "type": "reception counter",
+          "description": "Counter, also with side wing."
+        },
+        {
+          "collection": "I.POP / O.POP",
+          "type": "desks and meeting tables",
+          "description": "Workstations and meeting tables, I.POP with side wing."
+        },
+        {
+          "collection": "Oxygen",
+          "type": "round and meeting tables",
+          "description": "Also with credenza."
+        },
+        {
+          "collection": "Levels / New Pano",
+          "type": "tables"
+        },
+        {
+          "collection": "Tono",
+          "type": "storage",
+          "description": "Low and high modular storage units (4 to 6 modules)."
+        },
+        {
+          "collection": "Tendencies",
+          "type": "cabinets",
+          "description": "Cabinets with doors and shelves."
+        },
+        {
+          "collection": "W3 / Data / Ergomedic 150",
+          "type": "chairs",
+          "description": "Ergomedic 150 is the operative task chair."
+        },
+        {
+          "collection": "Hat",
+          "type": "pouf"
+        }
+      ]
+    },
+    {
+      "name": "Chameleon",
+      "origin": "Netherlands",
+      "positioning": "Whiteboards and writing walls in ceramic steel and glass, plus acoustic panels",
+      "best_for": [
+        "meeting rooms",
+        "hybrid and flexible workspaces",
+        "schools",
+        "writing walls"
+      ],
+      "key_collections": [
+        "Sharp",
+        "Curve",
+        "Round",
+        "Pebbles",
+        "Sharp Wall",
+        "Curve Wall",
+        "Glassboard",
+        "SatinTones",
+        "Chameleon Acoustics",
+        "Harmonica Workwall",
+        "Starterkit Deluxe"
+      ],
+      "indicative_price_range": null,
+      "price_status": "price list exists (RRP 2026): confirm with Célia",
+      "advisory_note": "Frameless ceramic-steel boards with magnetic mounting. SatinTones = matte, low-gloss, projectable, 6 colours.",
+      "source_catalogue": "Chameleon_price_list_catalogue_2026_EN.pdf + Chameleon - Lisbon.pdf",
+      "products": [
+        {
+          "collection": "Sharp / Curve / Round / Pebbles",
+          "type": "whiteboards",
+          "description": "Frameless ceramic-steel boards, magnetic mounting. Sharp comes in 11 sizes."
+        },
+        {
+          "collection": "Sharp Wall / Curve Wall / custom wall",
+          "type": "writing walls",
+          "description": "Large writing walls with minimal seams."
+        },
+        {
+          "collection": "Glassboard",
+          "type": "glass boards and walls",
+          "description": "Extra-clear low-iron tempered glass, 18 colours."
+        },
+        {
+          "collection": "SatinTones",
+          "type": "surface",
+          "description": "Matte ceramic steel, readable from every angle, suitable for projection."
+        },
+        {
+          "collection": "Chameleon Acoustics",
+          "type": "acoustic panels",
+          "description": "9 and 18 mm PET felt, in the same shapes as the boards."
+        },
+        {
+          "collection": "Harmonica Workwall",
+          "type": "mobile folding wall",
+          "description": "1 to 3 sections, up to 3.5 m of writing surface. Panels can be whiteboard or acoustic felt."
+        }
+      ]
+    },
+    {
+      "name": "Kriskadecor",
+      "origin": "Spain",
+      "positioning": "Aluminium chain curtains and installations, made to measure (since 1926)",
+      "best_for": [
+        "space dividers",
+        "offices",
+        "hotels and restaurants",
+        "retail and public spaces",
+        "branding with images or logos"
+      ],
+      "key_collections": [
+        "Essential (Claire Davies)",
+        "Gradient",
+        "Technical (Rafa Ortega)",
+        "Weaving",
+        "Space Dividers",
+        "Custom-made"
+      ],
+      "indicative_price_range": null,
+      "price_status": "on request",
+      "advisory_note": "Can reproduce images, patterns or corporate logos in chains. Some installations combine chains with sound-absorbing panels.",
+      "source_catalogue": "KRISKADECOR_Catalogo_Geral.pdf",
+      "products": [
+        {
+          "collection": "Essential",
+          "type": "chain collection",
+          "designer": "Claire Davies"
+        },
+        {
+          "collection": "Gradient",
+          "type": "chain collection",
+          "description": "Gradients of light and colour."
+        },
+        {
+          "collection": "Technical",
+          "type": "chain collection",
+          "designer": "Rafa Ortega"
+        },
+        {
+          "collection": "Space Dividers",
+          "type": "dividers",
+          "description": "Separate and connect spaces while keeping light."
+        },
+        {
+          "collection": "Custom-made",
+          "type": "installations",
+          "description": "Images, patterns and logos on chain curtains."
+        }
+      ]
+    }
+  ],
+  "comparison": "Kettal Workplace = architectural zoning. Ofitres = functional furniture and storage. Chameleon = whiteboards and writing walls. Kriskadecor = chain curtains and space dividers.",
+  "price_policy": "Never invent prices. Ranges marked 'indicative' come from brand research and are NOT a quote. For a firm price, hand over to the human owner of the segment."
+}

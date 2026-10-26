@@ -1,0 +1,4 @@
+Do step 6 only. In #finance, allow dropping an image or PDF. Send it to Grok vision with
+kit/prompts/finance.md, parse the JSON, create an approval of type "expense", and on approval
+save it in the expenses table. Add the Expenses tab in /admin with a CSV export.
+If the model cannot read PDFs directly, convert the first page to an image first.

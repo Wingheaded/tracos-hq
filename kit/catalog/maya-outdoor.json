@@ -1,0 +1,820 @@
+{
+  "agent": {
+    "name": "Maya",
+    "segment": "Outdoor furniture",
+    "human_owner": "Paulo"
+  },
+  "scope": [
+    "terraces",
+    "pool areas",
+    "hotel and restaurant exteriors",
+    "villas",
+    "pergolas and pavilions",
+    "tables, chairs, sofas, loungers, daybeds"
+  ],
+  "brands": [
+    {
+      "name": "Kettal",
+      "origin": "Spain",
+      "positioning": "Luxury / architectural outdoor living",
+      "best_for": [
+        "luxury hotels and resorts",
+        "villas",
+        "indoor-outdoor continuity",
+        "lounge areas"
+      ],
+      "key_collections": [
+        "Bitta",
+        "Cala",
+        "Giro",
+        "Landscape",
+        "Mesh",
+        "Park Life",
+        "Riba",
+        "Riva",
+        "Vimini",
+        "Net"
+      ],
+      "indicative_price_range": "€1,000+ per piece (see price_samples)",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Premium, permanent outdoor environments.",
+      "source_catalogue": "KETTAL_Catalogo_Living.pdf",
+      "products": [
+        {
+          "collection": "Tilos",
+          "type": "lounge / dining",
+          "description": "Metal shell with woven acrylic rope, inspired by bamboo and rattan.",
+          "designer": "Antonio Citterio"
+        },
+        {
+          "collection": "Insula",
+          "type": "modular sofa",
+          "designer": "Patricia Urquiola",
+          "description": "Low modular sofa inspired by the majlis."
+        },
+        {
+          "collection": "Grand Bitta / Bitta",
+          "type": "lounge / dining",
+          "description": "Dense braided rope inspired by boat moorings. Aluminium or teak legs.",
+          "designer": "Rodolfo Dordoni"
+        },
+        {
+          "collection": "Cala",
+          "type": "high-back armchair / dining",
+          "description": "Inspired by the Emmanuelle chair, open rope weave for privacy."
+        },
+        {
+          "collection": "Molo",
+          "type": "modular sofa",
+          "description": "Orthogonal modules that can be rearranged."
+        },
+        {
+          "collection": "Giro",
+          "type": "dining / lounge"
+        },
+        {
+          "collection": "Il Colonnato",
+          "type": "table",
+          "designer": "Mario Bellini",
+          "description": "Base inspired by classical colonnades."
+        },
+        {
+          "collection": "Kari",
+          "type": "side tables",
+          "designer": "Konstantin Grcic",
+          "description": "Teak side tables with cylinder or pyramid bases."
+        },
+        {
+          "collection": "Passage",
+          "type": "chair",
+          "description": "Indoor or outdoor."
+        },
+        {
+          "collection": "Loden",
+          "type": "armchair / sofa",
+          "description": "Reissue of a 1960s Gavina design."
+        },
+        {
+          "collection": "Pavilion H / V / L / Lounge Pavilion",
+          "type": "pergolas and pavilions",
+          "description": "Configurable structures for shade and outdoor rooms."
+        }
+      ]
+    },
+    {
+      "name": "Kettal Pavilions",
+      "origin": "Spain",
+      "positioning": "Luxury / outdoor structures",
+      "best_for": [
+        "pergolas",
+        "outdoor rooms",
+        "covered lounge or work areas",
+        "sun protection"
+      ],
+      "key_collections": [
+        "H Pavilion",
+        "L Pavilion",
+        "V Pavilion",
+        "Lounge Pavilion"
+      ],
+      "indicative_price_range": "€20,000 – €100,000+",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "When the goal is an outdoor room, not just furniture.",
+      "source_catalogue": "KETTAL_Catalogo_Living.pdf"
+    },
+    {
+      "name": "iSiMAR",
+      "origin": "Spain",
+      "positioning": "Accessible premium / contract metal furniture",
+      "best_for": [
+        "café and restaurant terraces",
+        "intensive use",
+        "coastal projects",
+        "colour"
+      ],
+      "key_collections": [
+        "Bolonia",
+        "Portofino",
+        "Paradiso"
+      ],
+      "indicative_price_range": "€200 – €800 per chair or stool",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Light, colourful, durable. Confirm stackability and salt resistance per model.",
+      "source_catalogue": "ISIMAR_Catalogo_2026.pdf",
+      "products": [
+        {
+          "collection": "Bolonia",
+          "type": "armchair, sofa, lounger, side table, pouf",
+          "description": "Galvanised steel, marine-grade durability. New in 2026."
+        },
+        {
+          "collection": "Lagarto",
+          "type": "sofa, pouf"
+        },
+        {
+          "collection": "Paradiso",
+          "type": "tables"
+        },
+        {
+          "collection": "Puerto",
+          "type": "upholstered chair and stool"
+        },
+        {
+          "collection": "Topos",
+          "type": "chair"
+        },
+        {
+          "collection": "Arena / Habana",
+          "type": "new collections"
+        },
+        {
+          "collection": "Barceloneta / Martini / Colonial / Mallorca / Menorca / Biarritz",
+          "type": "chairs and tables"
+        }
+      ]
+    },
+    {
+      "name": "Vondom",
+      "origin": "Spain",
+      "positioning": "High-end / sculptural polyethylene",
+      "best_for": [
+        "statement pieces",
+        "beach clubs",
+        "pool areas",
+        "events",
+        "illuminated furniture"
+      ],
+      "key_collections": [
+        "Africa",
+        "Faz",
+        "Suave",
+        "Ulm",
+        "Chrismy",
+        "Forest"
+      ],
+      "indicative_price_range": "€300 – €15,000+",
+      "price_status": "indicative, not confirmed",
+      "advisory_note": "Bold, iconic, modern. Confirm lighting options per collection.",
+      "source_catalogue": "VONDOM_DESIGNERS.pdf + VONDOM_SUN_LOUNGERS.pdf",
+      "products": [
+        {
+          "collection": "Pasadena",
+          "type": "sectional sofa, sun lounger"
+        },
+        {
+          "collection": "Suave",
+          "type": "sectional sofa"
+        },
+        {
+          "collection": "Ulm",
+          "type": "daybed"
+        },
+        {
+          "collection": "Africa",
+          "type": "chair, sun lounger"
+        },
+        {
+          "collection": "Posidonia",
+          "type": "sun lounger"
+        },
+        {
+          "collection": "Spritz / Gatsby / Love / Voxel / Ibiza",
+          "type": "sun loungers",
+          "description": "Several are Good Design award winners."
+        },
+        {
+          "collection": "Mel",
+          "type": "lounge chair"
+        },
+        {
+          "collection": "Vela / Quartz / Wing / Pixel / Jut",
+          "type": "furniture and planters"
+        },
+        {
+          "collection": "Chrismy / Forest",
+          "type": "illuminated Christmas trees"
+        }
+      ]
+    },
+    {
+      "name": "esTABLEes",
+      "origin": "Spain",
+      "positioning": "Technical solution for hospitality tables",
+      "best_for": [
+        "wobbly tables on uneven floors",
+        "cobblestones and old tiles",
+        "restaurant terraces"
+      ],
+      "key_collections": [
+        "SV30 self-levelling system"
+      ],
+      "indicative_price_range": null,
+      "price_status": "on request",
+      "advisory_note": "The technical fix for wobbly terrace tables. Price on request.",
+      "source_catalogue": "ESTABLEES_Catalogo_2026.pdf",
+      "products": [
+        {
+          "collection": "Square",
+          "type": "table (single or double)",
+          "description": "Stabiliser built into all 4 legs. Custom tops and rustproof base."
+        },
+        {
+          "collection": "Ágora",
+          "type": "table",
+          "description": "Light, stackable, easy to clean."
+        },
+        {
+          "collection": "Tars",
+          "type": "table base",
+          "description": "60° legs, takes round, square or rectangular tops."
+        },
+        {
+          "collection": "Ceramic",
+          "type": "table",
+          "description": "Inspired by pottery kilns."
+        }
+      ]
+    }
+  ],
+  "comparison": "Kettal = architectural premium. Pavilions = outdoor rooms. iSiMAR = light, colourful contract. Vondom = sculptural. esTABLEes = table stability.",
+  "price_samples": {
+    "source": "Kettal 2026 price list (sales prices), automatic extraction. Indicative: verify before quoting.",
+    "items": [
+      {
+        "brand": "Kettal",
+        "collection": "Band",
+        "product": "Club chair",
+        "price_from_eur_ex_vat": 2247
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Band",
+        "product": "Dining chair",
+        "price_from_eur_ex_vat": 1320
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Basket",
+        "product": "Indoor Club chair",
+        "price_from_eur_ex_vat": 1841
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Basket",
+        "product": "Outdoor Club chair",
+        "price_from_eur_ex_vat": 1841
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "2-Seater sofa Bela rope Aluminium legs",
+        "price_from_eur_ex_vat": 4182
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "2-Seater sofa Bela rope Teak legs",
+        "price_from_eur_ex_vat": 4182
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "3-Seater sofa Bela rope Aluminium legs",
+        "price_from_eur_ex_vat": 5323
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "3-Seater sofa Bela rope Teak legs",
+        "price_from_eur_ex_vat": 5323
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Bar stool Bela rope",
+        "price_from_eur_ex_vat": 1150
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Club armchair Bela rope Aluminium legs",
+        "price_from_eur_ex_vat": 2516
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Club armchair Bela rope Teak legs",
+        "price_from_eur_ex_vat": 2516
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Counter height Bar stool Bela rope",
+        "price_from_eur_ex_vat": 1150
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Daybed Bela rope Aluminium legs",
+        "price_from_eur_ex_vat": 4366
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Daybed Bela rope Teak legs",
+        "price_from_eur_ex_vat": 4366
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Deckchair Stool module Aluminium legs",
+        "price_from_eur_ex_vat": 2487
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Deckchair Stool module Teak legs",
+        "price_from_eur_ex_vat": 2487
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Deckchair module Aluminium legs",
+        "price_from_eur_ex_vat": 2531
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Deckchair module Teak legs",
+        "price_from_eur_ex_vat": 2531
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Dining armchair Bela rope Aluminium legs",
+        "price_from_eur_ex_vat": 980
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Dining armchair Bela rope Teak legs",
+        "price_from_eur_ex_vat": 980
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Stool L Aluminium legs",
+        "price_from_eur_ex_vat": 1631
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Bitta",
+        "product": "Stool L Teak legs",
+        "price_from_eur_ex_vat": 1631
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Cala",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 5181
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Cala",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 5893
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Cala",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 2615
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Cala",
+        "product": "Dining chair",
+        "price_from_eur_ex_vat": 1319
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Cala",
+        "product": "Stackable dining chair",
+        "price_from_eur_ex_vat": 933
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Duo DeckChair",
+        "product": "Duo deckchair",
+        "price_from_eur_ex_vat": 749
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Duo DeckChair",
+        "product": "Duo deckchair with arms",
+        "price_from_eur_ex_vat": 890
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Duo DeckChair",
+        "product": "Duo deckchair with wheels",
+        "price_from_eur_ex_vat": 877
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Duo DeckChair",
+        "product": "Duo deckchair with wheels and arms",
+        "price_from_eur_ex_vat": 981
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Eolias",
+        "product": "Outdoor Salina club armchair",
+        "price_from_eur_ex_vat": 1681
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Giro",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 6801
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Giro",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 4013
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Giro",
+        "product": "Folding dining armchair",
+        "price_from_eur_ex_vat": 2432
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Giro",
+        "product": "Stool",
+        "price_from_eur_ex_vat": 1456
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Grand Bitta",
+        "product": "2-Seater sofa Bela rope Teak legs",
+        "price_from_eur_ex_vat": 4182
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Grand Bitta",
+        "product": "3-Seater sofa Bela rope Teak legs",
+        "price_from_eur_ex_vat": 5335
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Grand Bitta",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 1046
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Grand Bitta",
+        "product": "Grand Bitta Daybed",
+        "price_from_eur_ex_vat": 4366
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Hudson",
+        "product": "Hudson deckchair",
+        "price_from_eur_ex_vat": 1185
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Insula",
+        "product": "Double Daybed module",
+        "price_from_eur_ex_vat": 5992
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "5-Position Lounger",
+        "price_from_eur_ex_vat": 1710
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "5-Position double Lounger",
+        "price_from_eur_ex_vat": 3054
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Club armchair L",
+        "price_from_eur_ex_vat": 1507
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Club armchair Teak armrest",
+        "price_from_eur_ex_vat": 1684
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Double Via deckchair",
+        "price_from_eur_ex_vat": 2167
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Double Via deckchair with arms",
+        "price_from_eur_ex_vat": 2332
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Double via deckchair with sled legs",
+        "price_from_eur_ex_vat": 2332
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Footstool",
+        "price_from_eur_ex_vat": 942
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Via deckchair",
+        "price_from_eur_ex_vat": 1095
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Via deckchair with arms",
+        "price_from_eur_ex_vat": 1269
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Landscape",
+        "product": "Via deckchair with sled legs",
+        "price_from_eur_ex_vat": 1269
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Maia",
+        "product": "Barstool",
+        "price_from_eur_ex_vat": 1126
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Maia",
+        "product": "Dining armchair Aluminium legs",
+        "price_from_eur_ex_vat": 919
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Maia",
+        "product": "Dining armchair Teak legs",
+        "price_from_eur_ex_vat": 1146
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Mesh",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 5848
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Mesh",
+        "product": "Daybed",
+        "price_from_eur_ex_vat": 5533
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Mesh",
+        "product": "Deckchair",
+        "price_from_eur_ex_vat": 2282
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Mesh",
+        "product": "Double deckchair",
+        "price_from_eur_ex_vat": 4045
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Molo XL",
+        "product": "Deckchair with small wheels",
+        "price_from_eur_ex_vat": 1470
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Molo XL",
+        "product": "Deckchair with wheels",
+        "price_from_eur_ex_vat": 1724
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Net",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 1170
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Net",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 599
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Net",
+        "product": "Lite club armchair",
+        "price_from_eur_ex_vat": 1053
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Net",
+        "product": "Lite dining armchair",
+        "price_from_eur_ex_vat": 509
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Park Life",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 2697
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Park Life",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 3355
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Park Life",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 1463
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Park Life",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 1149
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Passage",
+        "product": "Bar Stool without armrest",
+        "price_from_eur_ex_vat": 560
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Passage",
+        "product": "Low Bar Stool",
+        "price_from_eur_ex_vat": 375
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 1950
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 1950
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 1256
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 573
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "Dining chair",
+        "price_from_eur_ex_vat": 550
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "Footstool",
+        "price_from_eur_ex_vat": 612
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riba",
+        "product": "Low Club armchair",
+        "price_from_eur_ex_vat": 788
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Ringer",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 966
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riva",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 4527
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riva",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 6238
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riva",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 1264
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Riva",
+        "product": "Low club armchair",
+        "price_from_eur_ex_vat": 1447
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Tou",
+        "product": "Club armchair",
+        "price_from_eur_ex_vat": 1761
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Tou",
+        "product": "Outdoor Club armchair",
+        "price_from_eur_ex_vat": 2060
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Vimini",
+        "product": "2-Seater sofa",
+        "price_from_eur_ex_vat": 4558
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Vimini",
+        "product": "3-Seater sofa",
+        "price_from_eur_ex_vat": 5351
+      },
+      {
+        "brand": "Kettal",
+        "collection": "Vimini",
+        "product": "Dining armchair",
+        "price_from_eur_ex_vat": 1141
+      }
+    ]
+  },
+  "price_policy": "Never invent prices. Ranges marked 'indicative' come from brand research and are NOT a quote. For a firm price, hand over to the human owner of the segment."
+}

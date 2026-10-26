@@ -1,0 +1,2 @@
+Do step 4 only. Add the crm_search and crm_get_client tools to the Orchestrator using the
+Pipedrive REST API v1 (token and domain from .env.local). Read-only. Server side only.

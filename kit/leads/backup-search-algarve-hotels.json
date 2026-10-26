@@ -1,0 +1,174 @@
+{
+  "query": "Find hotels in the Algarve that opened, reopened after renovation, or are about to open (2025-2027)",
+  "researched_on": "2026-10-23",
+  "note": "Backup for the live demo. Real companies, public news sources only. Websites and generic contacts left empty on purpose. Sources checked on 2026-10-25: every company is named on its source page.",
+  "leads": [
+    {
+      "company": "Palácio de Tavira",
+      "website": "",
+      "city": "Tavira",
+      "sector": "hotel",
+      "why_it_fits": "36-room boutique hotel in a restored palace, opened Aug/Sep 2025, terraces and two rooftop pools",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "biophilia"
+      ],
+      "general_contact": "",
+      "source_url": "https://residentialadvisoryportugal.com/luxury-boutique-hotel-opens-in-tavira-algarve/"
+    },
+    {
+      "company": "Octant Praia Verde",
+      "website": "",
+      "city": "Castro Marim (Praia Verde)",
+      "sector": "hotel",
+      "why_it_fits": "Completed its largest renovation in Sep 2026: 19 new rooms, rooftop pools, spa and beach bar",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "acoustics"
+      ],
+      "general_contact": "",
+      "source_url": "https://insights.ehotelier.com/properties/2026/09/04/octant-praia-verde-completes-major-algarve-renovation-with-19-new-rooms-and-spa/"
+    },
+    {
+      "company": "Algarve Falésia Hotel",
+      "website": "",
+      "city": "Albufeira",
+      "sector": "hotel",
+      "why_it_fits": "Reopened in July 2026 as adults-only after a major renovation, with a new spa",
+      "relevant_segments": [
+        "outdoor",
+        "biophilia",
+        "lighting"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.theportugalnews.com/news/2026-07-17/algarve-falesia-hotel-reopens-after-major-renovation-as-adults-only-retreat-in-albufeira/1056768"
+    },
+    {
+      "company": "Hotel Indigo Albufeira",
+      "website": "",
+      "city": "Albufeira",
+      "sector": "hotel",
+      "why_it_fits": "Reopened in April 2025 after a full renovation under the IHG brand",
+      "relevant_segments": [
+        "outdoor",
+        "lighting"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.mercan.pt/en/new/2025/04/21/hotel-indigo-albufeira-reopens-after-full-renovation"
+    },
+    {
+      "company": "Wine & Books by the Sea Algarve Resort",
+      "website": "",
+      "city": "Albufeira",
+      "sector": "hotel",
+      "why_it_fits": "Former VidaMar, reopened under a new brand in March 2026 (250 rooms)",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "acoustics"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.cornwallairportnewquay.com/guest-blogs/whats-new-in-the-algarve-for-2026/"
+    },
+    {
+      "company": "Hyatt Regency Vilamoura Algarve",
+      "website": "",
+      "city": "Vilamoura",
+      "sector": "hotel",
+      "why_it_fits": "Opened in January 2026. Fit-out done, so a target for future terrace and rooftop projects",
+      "relevant_segments": [
+        "outdoor",
+        "lighting"
+      ],
+      "general_contact": "",
+      "source_url": "https://newsroom.hyatt.com/HyattRegencyVillamouraOpening"
+    },
+    {
+      "company": "Masana Algarve (Destination by Hyatt)",
+      "website": "",
+      "city": "Algarve",
+      "sector": "hotel",
+      "why_it_fits": "First Destination by Hyatt resort in Portugal. Opening date differs between sources: confirm",
+      "relevant_segments": [
+        "outdoor",
+        "biophilia"
+      ],
+      "general_contact": "",
+      "source_url": "https://newsroom.hyatt.com/MasanaAlgarve"
+    },
+    {
+      "company": "Canopy by Hilton Vilamoura Marina",
+      "website": "",
+      "city": "Vilamoura",
+      "sector": "hotel",
+      "why_it_fits": "Pre-opening: 155 rooms expected in 2026. Furniture and lighting decisions may still be open",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "acoustics",
+        "biophilia"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.cornwallairportnewquay.com/guest-blogs/whats-new-in-the-algarve-for-2026/"
+    },
+    {
+      "company": "Lagos Marina Hotel, Curio Collection by Hilton",
+      "website": "",
+      "city": "Lagos",
+      "sector": "hotel",
+      "why_it_fits": "Pre-opening: 180 rooms expected in 2026, marina setting",
+      "relevant_segments": [
+        "outdoor",
+        "lighting"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.cornwallairportnewquay.com/guest-blogs/whats-new-in-the-algarve-for-2026/"
+    },
+    {
+      "company": "InterContinental Vilamoura",
+      "website": "",
+      "city": "Vilamoura",
+      "sector": "hotel",
+      "why_it_fits": "Conversion of the existing Crowne Plaza, slated for 2027: full refurbishment ahead",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "acoustics",
+        "workplace"
+      ],
+      "general_contact": "",
+      "source_url": "https://travel.yahoo.com/hotels/articles/discover-intercontinental-vilamoura-algarves-luxury-121000248.html"
+    },
+    {
+      "company": "Casa de Sada Algarve Beach Resort, Curio Collection by Hilton",
+      "website": "",
+      "city": "Algarve",
+      "sector": "hotel",
+      "why_it_fits": "183-room resort fully transformed, anticipated opening Q2 2026, balconies and terraces facing the Atlantic, pools and bars",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "biophilia"
+      ],
+      "general_contact": "",
+      "source_url": "https://stories.hilton.com/releases/new-hilton-openings-in-2026"
+    },
+    {
+      "company": "Riverside Hotel Faro",
+      "website": "",
+      "city": "Faro",
+      "sector": "hotel",
+      "why_it_fits": "Opening late 2026 / early 2027",
+      "relevant_segments": [
+        "outdoor",
+        "lighting",
+        "biophilia"
+      ],
+      "general_contact": "",
+      "source_url": "https://www.cornwallairportnewquay.com/guest-blogs/whats-new-in-the-algarve-for-2026/"
+    }
+  ],
+  "verified_on": "2026-10-25"
+}

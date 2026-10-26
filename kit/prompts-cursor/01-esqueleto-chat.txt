@@ -1,0 +1,8 @@
+Do step 1 of the build order in kit/BRIEF.md only.
+Create the Next.js app (App Router, TypeScript, Tailwind) in this folder, without touching kit/ or .env.local.
+The folder is not empty: if create-next-app refuses, scaffold it in a temporary subfolder and move the files up, keeping kit/ and .env.local as they are.
+Run git init first and add a .gitignore that excludes node_modules, .env.local and data/.
+Build the chat screen: sidebar with #general, #clients, #finance, #leads and the agent list,
+a user dropdown (Paulo, Nelson, José), messages stored in SQLite (data/app.db, schema from the BRIEF).
+Add one "Echo" agent that replies when mentioned with @Echo, just to prove the loop works.
+Tell me the exact command to run it.

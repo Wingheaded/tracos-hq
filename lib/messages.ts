@@ -63,6 +63,28 @@ export function postHumanMessage(input: {
   return save(input.channel, input.author, input.content);
 }
 
+export function insertAgentMessage(input: { channel: Channel; author: string; content: string }): Message {
+  const db = getDb();
+  const inserted = db
+    .prepare(
+      `INSERT INTO messages (channel, author, author_type, content, meta_json, created_at)
+       VALUES (@channel, @author, 'agent', @content, NULL, @created_at)`,
+    )
+    .run({
+      channel: input.channel,
+      author: input.author,
+      content: input.content,
+      created_at: new Date().toISOString(),
+    });
+  return db
+    .prepare(
+      `SELECT id, channel, author, author_type, content, meta_json, created_at
+       FROM messages
+       WHERE id = ?`,
+    )
+    .get(inserted.lastInsertRowid) as Message;
+}
+
 export function parsePostBody(body: unknown):
   | { ok: true; channel: Channel; author: UserName; content: string }
   | { ok: false; error: string } {

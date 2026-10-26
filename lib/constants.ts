@@ -23,6 +23,20 @@ export const AGENTS = [
   { name: "Leads", detail: "Prospects" },
 ] as const;
 
+export const SPECIALISTS = [
+  { name: "Daniel", segment: "Lighting", humanOwner: "João", catalogFile: "daniel-lighting.json" },
+  { name: "Tomás", segment: "Acoustics", humanOwner: "Joana", catalogFile: "tomas-acoustics.json" },
+  { name: "Maya", segment: "Outdoor furniture", humanOwner: "Paulo", catalogFile: "maya-outdoor.json" },
+  { name: "André", segment: "Corporate / workplace", humanOwner: "Célia", catalogFile: "andre-corporate.json" },
+  { name: "Inês", segment: "Biophilia", humanOwner: "Nelson", catalogFile: "ines-biophilia.json" },
+] as const;
+
+export type SpecialistName = (typeof SPECIALISTS)[number]["name"];
+
+export function isSpecialistName(value: string): value is SpecialistName {
+  return SPECIALISTS.some((specialist) => specialist.name === value);
+}
+
 export function isChannel(value: string): value is Channel {
   return CHANNELS.some((channel) => channel.id === value);
 }

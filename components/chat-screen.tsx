@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AGENTS, CHANNELS, USERS, type Channel, type UserName } from "@/lib/constants";
-import { consultedNames, type Message } from "@/lib/message";
+import { consultedNames, mentionedSpecialists, type Message, type SpecialistStreamEvent } from "@/lib/message";
 
 const speakerListeners = new Set<() => void>();
 
@@ -33,13 +33,38 @@ function formatTime(iso: string) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-const EMPTY_MESSAGES: Message[] = [];
+type ChatMessage = Message & { pending?: boolean };
+
+const EMPTY_MESSAGES: ChatMessage[] = [];
 
 type LoadState = {
   channel: Channel;
-  messages: Message[];
+  messages: ChatMessage[];
   error: string | null;
 };
+
+async function readSpecialistStream(
+  response: Response,
+  onEvent: (event: SpecialistStreamEvent) => void,
+) {
+  if (!response.body) throw new Error("The specialist reply had no stream.");
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const chunks = buffer.split("\n\n");
+    buffer = chunks.pop() ?? "";
+    for (const chunk of chunks) {
+      const line = chunk.trim();
+      if (!line.startsWith("data:")) continue;
+      onEvent(JSON.parse(line.slice(5).trim()) as SpecialistStreamEvent);
+    }
+  }
+}
 
 export function ChatScreen() {
   const [channel, setChannel] = useState<Channel>("general");
@@ -52,9 +77,14 @@ export function ChatScreen() {
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const channelRef = useRef(channel);
   const generation = useRef(0);
+  const replyAbort = useRef<AbortController | null>(null);
+  const pendingId = useRef(0);
 
   useEffect(() => {
     channelRef.current = channel;
+    return () => {
+      replyAbort.current?.abort();
+    };
   }, [channel]);
 
   const active = CHANNELS.find((item) => item.id === channel) ?? CHANNELS[0];
@@ -112,6 +142,9 @@ export function ChatScreen() {
     if (!content || sending) return;
     const target = channel;
     const generationAtStart = ++generation.current;
+    replyAbort.current?.abort();
+    const abort = new AbortController();
+    replyAbort.current = abort;
 
     setSending(true);
     setSendError(null);
@@ -120,24 +153,79 @@ export function ChatScreen() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channel: target, author, content }),
+        signal: abort.signal,
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? "Could not send the message.");
 
-      const listed = await fetch(`/api/messages?channel=${target}`);
+      const listed = await fetch(`/api/messages?channel=${target}`, { signal: abort.signal });
       const payload = (await listed.json()) as { messages?: Message[]; error?: string };
       if (!listed.ok) throw new Error(payload.error ?? "Could not load messages.");
-      if (channelRef.current === target && generation.current === generationAtStart) {
-        setLoaded({ channel: target, messages: payload.messages ?? [], error: null });
-        setDraft("");
+      if (channelRef.current !== target || generation.current !== generationAtStart) return;
+      setLoaded({ channel: target, messages: payload.messages ?? [], error: null });
+      setDraft("");
+
+      for (const agent of mentionedSpecialists(content)) {
+        if (channelRef.current !== target || generation.current !== generationAtStart) return;
+        const tempId = --pendingId.current;
+        setLoaded((current) => {
+          if (!current || current.channel !== target) return current;
+          return {
+            ...current,
+            messages: [
+              ...current.messages,
+              {
+                id: tempId,
+                channel: target,
+                author: agent,
+                author_type: "agent",
+                content: "",
+                meta_json: null,
+                created_at: new Date().toISOString(),
+                pending: true,
+              },
+            ],
+          };
+        });
+
+        const streamed = await fetch("/api/specialists", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ channel: target, agent, content }),
+          signal: abort.signal,
+        });
+        if (!streamed.ok) {
+          const failure = (await streamed.json().catch(() => ({}))) as { error?: string };
+          throw new Error(failure.error ?? "The specialist could not answer.");
+        }
+
+        await readSpecialistStream(streamed, (event) => {
+          if (channelRef.current !== target || generation.current !== generationAtStart) return;
+          if (event.type === "error") throw new Error(event.error);
+          setLoaded((current) => {
+            if (!current || current.channel !== target) return current;
+            return {
+              ...current,
+              messages: current.messages.map((message) => {
+                if (message.id !== tempId) return message;
+                if (event.type === "delta") return { ...message, content: message.content + event.text };
+                if (event.type === "message") return event.message;
+                return message;
+              }),
+            };
+          });
+        });
       }
     } catch (cause: unknown) {
+      if (cause instanceof DOMException && cause.name === "AbortError") return;
       if (channelRef.current === target) {
         setSendError(cause instanceof Error ? cause.message : "Could not send the message.");
       }
     } finally {
-      setSending(false);
-      composerRef.current?.focus();
+      if (replyAbort.current === abort) {
+        setSending(false);
+        composerRef.current?.focus();
+      }
     }
   }
 
@@ -201,7 +289,7 @@ export function ChatScreen() {
             <p className="py-8 text-sm text-muted">Loading messages…</p>
           ) : messages.length === 0 ? (
             <p className="max-w-md py-8 text-sm leading-6 text-muted">
-              No messages in {active.label} yet. Write to the team, and mention @Echo to prove the reply loop.
+              No messages in {active.label} yet. Mention @Echo, or a specialist: @Daniel, @Tomás, @Maya, @André, @Inês.
             </p>
           ) : (
             <ol>
@@ -216,7 +304,9 @@ export function ChatScreen() {
                       </time>
                     </div>
                     <div className={message.author_type === "agent" ? "border-l-2 border-olive pl-3" : undefined}>
-                      <p className="whitespace-pre-wrap text-[15px] leading-6">{message.content}</p>
+                      <p className="whitespace-pre-wrap text-[15px] leading-6">
+                        {message.content || (message.pending ? "…" : "")}
+                      </p>
                       {consulted.length > 0 ? (
                         <p className="mt-1 text-xs text-muted">Consulted: {consulted.join(", ")}</p>
                       ) : null}
@@ -256,7 +346,7 @@ export function ChatScreen() {
               value={draft}
               rows={2}
               aria-label={`Message ${active.label}`}
-              placeholder={`Message ${active.label}. Mention @Echo to test the loop.`}
+              placeholder={`Message ${active.label}. Mention @Echo or a specialist.`}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {

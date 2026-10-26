@@ -41,7 +41,8 @@ The lab offered three tools: Cursor, Grok Bot and the xAI API. We used Cursor to
 - **Rules enforced in code, not in a prompt.** Human approval before any CRM write and the duplicate check run on the server every time. With an assistant they depend on the model following its instructions. During testing the Orchestrator proposed a client visit nobody had asked for; the approval queue, not the model, kept it out of Pipedrive.
 - **One door to the CRM.** Only the Orchestrator writes to Pipedrive. Several assistants connected to the CRM would each write on their own.
 - **One shared workspace.** Paulo, Nelson and José see the same channels, approvals and leads. Assistants are usually personal to each user.
-- **Control of data and cost.** The catalogues, prices and history stay with Traços, and the AI model can be changed later without rebuilding the app.
+- **Pay for use, not per seat.** The app calls the xAI API and Traços pays only for what the agents actually use. Running the same team on Grok Bot would mean a team plan paid per member, every month, whether each person uses it or not.
+- **Control of data.** The catalogues, prices and history stay with Traços, and the AI model can be changed later without rebuilding the app.
 
 Grok Bot fits the personal side of the roadmap: an email assistant for each colleague that sorts priorities and drafts replies, handing anything that belongs in the CRM to Traços HQ.
 

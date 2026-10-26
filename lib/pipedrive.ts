@@ -59,15 +59,23 @@ function config(): PipedriveConfig {
   return { origin, token };
 }
 
-async function pipedriveGet(path: string, params: Record<string, string> = {}): Promise<unknown> {
+async function pipedriveRequest(
+  path: string,
+  options: { method?: "GET" | "POST"; params?: Record<string, string>; body?: Record<string, unknown> } = {},
+): Promise<unknown> {
   const { origin, token } = config();
   const url = new URL(`/api/v1/${path.replace(/^\//, "")}`, origin);
   url.searchParams.set("api_token", token);
-  for (const [key, value] of Object.entries(params)) {
+  for (const [key, value] of Object.entries(options.params ?? {})) {
     url.searchParams.set(key, value);
   }
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    method: options.method ?? "GET",
+    cache: "no-store",
+    headers: options.body ? { "Content-Type": "application/json" } : undefined,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
   let body: unknown = null;
   try {
     body = await response.json();
@@ -75,12 +83,17 @@ async function pipedriveGet(path: string, params: Record<string, string> = {}): 
     body = null;
   }
 
-  const record = body && typeof body === "object" ? (body as { success?: boolean; data?: unknown }) : null;
+  const record = body && typeof body === "object" ? (body as { success?: boolean; data?: unknown; error?: unknown }) : null;
   if (!response.ok || !record?.success) {
-    if (response.status === 404) throw new Error("Pipedrive client was not found.");
-    throw new Error(`Pipedrive request failed (${response.status}).`);
+    const detail = typeof record?.error === "string" && !/api_token|token/i.test(record.error) ? record.error : null;
+    if (response.status === 404) throw new Error(detail ?? "Pipedrive client was not found.");
+    throw new Error(detail ?? `Pipedrive request failed (${response.status}).`);
   }
   return record.data;
+}
+
+async function pipedriveGet(path: string, params: Record<string, string> = {}): Promise<unknown> {
+  return pipedriveRequest(path, { params });
 }
 
 function text(value: unknown): string | null {
@@ -118,6 +131,75 @@ function firstContact(value: unknown): string | null {
 function asList(data: unknown): Record<string, unknown>[] {
   if (!Array.isArray(data)) return [];
   return data.filter((item): item is Record<string, unknown> => !!item && typeof item === "object");
+}
+
+function definedFields(fields: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined && value !== null && value !== ""));
+}
+
+export async function createCrmNote(payload: {
+  content: string;
+  org_id?: number;
+  deal_id?: number;
+  person_id?: number;
+}): Promise<number> {
+  const data = await pipedriveRequest("notes", {
+    method: "POST",
+    body: definedFields({
+      content: payload.content,
+      org_id: payload.org_id,
+      deal_id: payload.deal_id,
+      person_id: payload.person_id,
+    }),
+  });
+  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  if (id === null) throw new Error("Pipedrive did not return a note id.");
+  return id;
+}
+
+export async function createCrmActivity(payload: {
+  subject: string;
+  type?: string;
+  due_date?: string;
+  org_id?: number;
+  deal_id?: number;
+  person_id?: number;
+  note?: string;
+}): Promise<number> {
+  const data = await pipedriveRequest("activities", {
+    method: "POST",
+    body: definedFields({
+      subject: payload.subject,
+      type: payload.type || "meeting",
+      due_date: payload.due_date,
+      org_id: payload.org_id,
+      deal_id: payload.deal_id,
+      person_id: payload.person_id,
+      note: payload.note,
+      done: 0,
+    }),
+  });
+  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  if (id === null) throw new Error("Pipedrive did not return an activity id.");
+  return id;
+}
+
+export async function createCrmLead(payload: {
+  title: string;
+  organization_id?: number;
+  person_id?: number;
+}): Promise<number> {
+  const data = await pipedriveRequest("leads", {
+    method: "POST",
+    body: definedFields({
+      title: payload.title,
+      organization_id: payload.organization_id,
+      person_id: payload.person_id,
+    }),
+  });
+  const id = numberOrNull(data && typeof data === "object" ? (data as { id?: unknown }).id : null);
+  if (id === null) throw new Error("Pipedrive did not return a lead id.");
+  return id;
 }
 
 export async function crmSearch(query: string): Promise<CrmSearchHit[]> {

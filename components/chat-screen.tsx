@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AGENTS, CHANNELS, USERS, type Channel, type UserName } from "@/lib/constants";
 import { consultedNames, type Message } from "@/lib/message";
@@ -146,6 +147,9 @@ export function ChatScreen() {
         <div className="px-4 py-4">
           <p className="font-display text-[1.7rem] leading-none text-white">Traços</p>
           <p className="mt-1 text-sm text-mist/75">Internal workspace</p>
+          <Link href="/admin" className="mt-3 inline-block text-sm text-mist/80 underline-offset-2 hover:text-white hover:underline">
+            Approvals
+          </Link>
         </div>
 
         <nav aria-label="Channels" className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:px-2">
